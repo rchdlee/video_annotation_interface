@@ -1,0 +1,54 @@
+{
+  "path": "https://www.youtube.com/embed/aJgAwjP20RY",
+  "fps": 30,
+  "channels": [
+    {
+      "name": "Head movements",
+      "annotation": [
+        {
+          "label": "Type of head movement",
+          "type": "radio",
+          "options": [
+            { "option": "Nod" },
+            { "option": "Shake" },
+            { "option": "Other" }
+          ]
+        },
+        {
+          "label": "Comments",
+          "type": "textbox"
+        }
+      ]
+    },
+    {
+      "name": "Expressions",
+      "annotation": [
+        {
+          "label": "Type of expression",
+          "type": "radio",
+          "options": [
+            { "option": "Smile" },
+            { "option": "Sad" },
+            { "option": "Other" }
+          ]
+        },
+        {
+          "label": "Comments",
+          "type": "textbox"
+        }
+      ]
+    },
+    {
+      "name": "QC Problems",
+      "annotation": [
+        {
+          "label": "Comments",
+          "type": "textbox"
+        }
+      ]
+    },
+    {
+      "name": "Speech"
+    }
+  ]
+}
