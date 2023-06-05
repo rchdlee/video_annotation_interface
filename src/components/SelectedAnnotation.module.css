@@ -1,5 +1,48 @@
 .container {
   width: 20vw;
   /* margin-left: 24px; */
-  border: 1px solid black;
+  border: 2px solid black;
+  border-radius: 8px;
+}
+
+.inner-container {
+  margin: 24px 36px;
+}
+
+.deselect {
+  text-align: right;
+}
+
+.annotation-information {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.annotation-descriptor {
+  display: flex;
+  gap: 8px;
+}
+
+.annotation-descriptor p {
+  margin: 0;
+}
+
+.radio-form p {
+  margin-top: 12px;
+  margin-bottom: 12px;
+}
+
+.radio-form form {
+  margin-left: 12px;
+}
+
+.radio-btn {
+  margin-bottom: 4px;
+}
+
+.comments p {
+  margin-top: 12px;
+  margin-bottom: 8px;
 }

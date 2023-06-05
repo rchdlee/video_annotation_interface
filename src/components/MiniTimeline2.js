@@ -1,6 +1,6 @@
-import { useState } from "react";
-
-import { useSelector } from "react-redux";
+import Slider, { Handle } from "rc-slider";
+import "rc-slider/assets/index.css";
+import Timetick from "../media/Timetick";
 
 import { secondsToMinAndSec } from "../helpers/SecondsTimeFormat";
 
@@ -33,8 +33,20 @@ const MiniTimeline2 = (props) => {
     );
   });
 
+  // const sliderChangeHandler = (e) => {
+  //   props.onSliderChange(parseFloat(e.target.value));
+  // };
+
+  // const mouseDownHandler = () => {
+  //   props.onMouseDown();
+  // };
+
+  // const mouseUpHandler = (e) => {
+  //   props.onMouseUp(parseFloat(e.target.value));
+  // };
+
   const sliderChangeHandler = (e) => {
-    props.onSliderChange(parseFloat(e.target.value));
+    props.onSliderChange(parseFloat(e));
   };
 
   const mouseDownHandler = () => {
@@ -42,12 +54,12 @@ const MiniTimeline2 = (props) => {
   };
 
   const mouseUpHandler = (e) => {
-    props.onMouseUp(parseFloat(e.target.value));
+    props.onMouseUp(parseFloat(e));
   };
 
   return (
-    <div>
-      <input
+    <div style={{ marginTop: "8px" }}>
+      {/* <input
         id="input"
         type="range"
         min={0}
@@ -57,6 +69,25 @@ const MiniTimeline2 = (props) => {
         onMouseDown={mouseDownHandler}
         onChange={sliderChangeHandler}
         onMouseUp={mouseUpHandler}
+      /> */}
+      <Slider
+        min={0}
+        max={0.999}
+        step={0.001}
+        value={props.playedFrac}
+        onMouseDown={mouseDownHandler}
+        onMouseUp={mouseUpHandler}
+        onChange={sliderChangeHandler}
+        trackStyle={{ display: "none" }}
+        railStyle={{ display: "none" }}
+        handleStyle={{ border: "2px solid white", boxShadow: "none" }}
+        handle={(handleProps) => {
+          return (
+            <Handle {...handleProps}>
+              <Timetick />
+            </Handle>
+          );
+        }}
       />
       <div className={classes["mini-timeline"]}>
         <div className={classes["tick-container"]}>{miniTimelineValues}</div>

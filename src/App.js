@@ -13,6 +13,8 @@ import clip from "./media/lexclip.mp4";
 import inputData from "./media/input.json";
 import { annotationActions } from "./store/annotation-slice";
 import Annotations from "./components/Annotations";
+import MiniTimeline3 from "./components/MiniTimeline3";
+import MiniTimeline4 from "./components/MiniTimeline4";
 
 function App() {
   const playerRef = useRef(null);
@@ -77,6 +79,10 @@ function App() {
 
   const zoomInHandler = () => {
     setZoom((prevState) => prevState + 0.5);
+  };
+
+  const resetZoomHandler = () => {
+    setZoom(1);
   };
   //
 
@@ -159,6 +165,16 @@ function App() {
   };
   //
 
+  /////////////////////////
+  // minitimeline 3
+
+  // move state stuff to this app parent component to prevent rerender cycle?
+  // const [isHoveringHandle, setIsHoveringHandle] = useState(false);
+  // const [miniTimelineXPos, setMiniTimelineXPos] = useState(0);
+  // const [mousePosX, setMousePosX] = useState(0);
+
+  /////////////////////////
+
   return (
     <div className={classes["app-container"]}>
       <div className={classes["upper-container"]}>
@@ -181,6 +197,7 @@ function App() {
             setSeekingTrue={handleSeekingTrue}
             setSeekingFalse={handleSeekingFalse}
             handleSeek={handleSeek}
+            updatePlayedFrac={updatePlayedFrac}
           /> */}
           <MiniTimeline2
             playedFrac={videoState.playedFrac}
@@ -192,6 +209,30 @@ function App() {
             timelineValueRange={timelineValueRange}
             zoomLevel={zoom}
           />
+          {/* <MiniTimeline3
+            width={playerWidth}
+            playedFrac={videoState.playedFrac}
+            updatePlayedFrac={updatePlayedFrac}
+            isHoveringHandle={isHoveringHandle}
+            setIsHoveringHandle={setIsHoveringHandle}
+            miniTimelineXPos={miniTimelineXPos}
+            setMiniTimelineXPos={setMiniTimelineXPos}
+            mousePosX={mousePosX}
+            setMousePosX={setMousePosX}
+            handleSeekingTrue={handleSeekingTrue}
+            handleSeekingFalse={handleSeekingFalse}
+            seeking={videoState.seeking}
+          /> */}
+          {/* <MiniTimeline4
+            playedFrac={videoState.playedFrac}
+            onSliderChange={updatePlayedFrac}
+            onMouseDown={handleMouseDown}
+            onMouseUp={handleMouseUp}
+            duration={videoState.duration}
+            miniTimelineTicks={miniTimelineTicks}
+            timelineValueRange={timelineValueRange}
+            zoomLevel={zoom}
+          /> */}
           <PlayerControls
             onPlayPauseClick={playPauseHandler}
             playing={videoState.playing}
@@ -210,9 +251,13 @@ function App() {
           zoomLevel={zoom}
           zoomIn={zoomInHandler}
           zoomOut={zoomOutHandler}
+          resetZoom={resetZoomHandler}
           duration={videoState.duration}
           playedFrac={videoState.playedFrac}
           timelineValueRange={timelineValueRange}
+          onSliderChange={updatePlayedFrac}
+          onMouseDown={handleMouseDown}
+          onMouseUp={handleMouseUp}
         />
       </div>
     </div>

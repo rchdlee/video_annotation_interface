@@ -9,14 +9,16 @@ const MiniTimeline = (props) => {
   const timelineWidth = props.width;
   const [seeking, setSeeking] = useState(false);
 
-  const [miniTimelineX, setMiniTimelineX] = useState();
-  const [mousePosX, setMousePosX] = useState();
+  const [miniTimelineX, setMiniTimelineX] = useState(0);
+  const [mousePosX, setMousePosX] = useState(0);
 
   const playedFrac = props.playedFrac;
   const timelineFrac = (mousePosX - miniTimelineX) / timelineWidth;
 
+  const leftFromMiniTimeline = mousePosX - miniTimelineX;
+
   const leftPxTest = seeking
-    ? mousePosX - miniTimelineX
+    ? leftFromMiniTimeline
     : playedFrac * timelineWidth;
 
   // position of mini-timeline (x)
@@ -34,9 +36,9 @@ const MiniTimeline = (props) => {
   //
 
   const mouseDownHandler = () => {
-    console.log("clicked down!");
     // props.setSeekingTrue();
     setSeeking(true);
+    console.log("clicked down!");
   };
 
   // const mouseUpHandler = () => {
@@ -61,9 +63,12 @@ const MiniTimeline = (props) => {
     const handleMouseMove = (event) => {
       setMousePosX(event.clientX);
       if (seeking) {
-        props.handleSeek(timelineFrac);
+        // props.handleSeek(timelineFrac);
+        props.updatePlayedFrac(timelineFrac);
+        console.log("updating played frac 🐱");
       }
-      console.log(timelineFrac, mousePosX, miniTimelineX, timelineWidth);
+      // props.updatePlayedFrac(timelineFrac);
+      // console.log("updating played frac 🐱");
     };
 
     window.addEventListener("mousemove", handleMouseMove);
@@ -109,6 +114,7 @@ const MiniTimeline = (props) => {
         ></div>
       </div>
       <div>mouse pos x: {mousePosX}</div>
+      <div>left from minitimeline: {leftFromMiniTimeline}</div>
     </div>
   );
 };
