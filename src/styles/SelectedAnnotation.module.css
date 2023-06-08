@@ -13,6 +13,10 @@
   text-align: right;
 }
 
+.deselect:hover {
+  text-decoration: underline;
+}
+
 .annotation-information {
   display: flex;
   flex-direction: column;
@@ -29,6 +33,10 @@
   margin: 0;
 }
 
+.radio-form {
+  margin-bottom: 12px;
+}
+
 .radio-form p {
   margin-top: 12px;
   margin-bottom: 12px;
@@ -42,7 +50,29 @@
   margin-bottom: 4px;
 }
 
-.comments p {
-  margin-top: 12px;
+.comment-label-container {
   margin-bottom: 8px;
+}
+
+.comments div {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.comments button {
+  height: 20px;
+}
+
+.comments input {
+  height: 20px;
+}
+
+.comments p {
+  margin-bottom: 8px;
+}
+
+.edit-input {
+  margin-bottom: 8px;
+  margin-left: 16px;
 }

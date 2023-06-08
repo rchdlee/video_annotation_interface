@@ -8,7 +8,7 @@ export const secondsToMinAndSecDecimal = (timeSec) => {
   }
 
   const finalTime =
-    str_pad_left(minutes, "0", 2) +
+    str_pad_left(minutes, "", 2) +
     ":" +
     str_pad_left(seconds, "0", 2) +
     "." +

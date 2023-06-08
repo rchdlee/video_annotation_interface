@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 
-import classes from "./MiniTimeline3.module.css";
+import classes from "../styles/MiniTimeline3.module.css";
 
 const MiniTimeline3 = (props) => {
   const miniTimelineRef = useRef();

@@ -5,7 +5,7 @@ import { annotationActions } from "../store/annotation-slice";
 import Slider, { Handle } from "rc-slider";
 import { v4 as uuidv4 } from "uuid";
 
-import classes from "./Annotations.module.css";
+import classes from "../styles/Annotations.module.css";
 // import Timebar from "../media/timebar.svg";
 import Timebar from "../media/Timebar";
 import FinishIcon from "../media/FinishIcon";
@@ -14,8 +14,8 @@ import { secondsToMinAndSecDecimal } from "../helpers/SecondsTimeFormat";
 const Annotations = (props) => {
   //
   // MOVE TO APP.JS FOR SELECTEDANNO DESELECTING
-  const [currentlySelectedSegment, setCurrentlySelectedSegment] =
-    useState(null);
+  // const [currentlySelectedSegment, setCurrentlySelectedSegment] =
+  //   useState(null);
   const [isSelectingFinishTime, setIsSelectingFinishTime] = useState(false);
   const [initialAnnotationData, setInitialAnnotationData] = useState({
     category: null,
@@ -32,7 +32,10 @@ const Annotations = (props) => {
     if (props.windowNumber) {
       return (
         <div style={{ position: "relative" }} key={timeTick}>
-          <div style={{ height: "8px", borderLeft: "2px solid black" }}></div>
+          {/* <div style={{ height: "8px", borderLeft: "2px solid black" }}></div> */}
+          <div
+            style={{ height: "8px", width: "2px", backgroundColor: "black" }}
+          ></div>
           <p style={{ position: "absolute", margin: "0" }}>
             {secondsToMinAndSecDecimal(timeTick)}
           </p>
@@ -41,55 +44,12 @@ const Annotations = (props) => {
     }
   });
 
-  const DUMMY_ANNOTATIONS = [
-    {
-      segmentID: "1249-yu23",
-      timeStartSec: 14,
-      timeEndSec: 17.9,
-      categoryName: "Head movements",
-      radio: null,
-      comments: null,
-    },
-    {
-      segmentID: "2f2t-3tku",
-      timeStartSec: 125,
-      timeEndSec: 142,
-      categoryName: "Head movements",
-      radio: null,
-      comments: null,
-    },
-    {
-      segmentID: "2pvf-tvh2",
-      timeStartSec: 218,
-      timeEndSec: 224,
-      categoryName: "Expressions",
-      radio: null,
-      comments: null,
-    },
-    {
-      segmentID: "9849-th38",
-      timeStartSec: 232,
-      timeEndSec: 265,
-      categoryName: "QC Problems",
-      radio: null,
-      comments: null,
-    },
-    {
-      segmentID: "t33t-38fb",
-      timeStartSec: 278,
-      timeEndSec: 283,
-      categoryName: "Speech",
-      radio: null,
-      comments: null,
-    },
-  ];
-
   const startSegmentHandler = (e) => {
     const category = e.target.closest("div").id;
     const startTime = props.duration * props.playedFrac;
     console.log(category, startTime, "🧩");
 
-    // OVERLAP VALIDATION
+    // OVERLAP CHECK
     const sameCategoryData = annotations.filter(
       (segment) => segment.categoryName === category
     );
@@ -114,23 +74,11 @@ const Annotations = (props) => {
       setInitialAnnotationData((prevState) => ({
         ...prevState,
         category: category,
-        startTimeSec: startTime,
+        startTimeSec: startTime.toFixed(2),
       }));
       setIsSelectingFinishTime(true);
     }
   };
-
-  // const testID = uuidv4();
-  // console.log(testID, "☕");
-
-  // {
-  //   segmentID: "1249-yu23",
-  //   timeStartSec: 14,
-  //   timeEndSec: 27.9,
-  //   categoryName: "Head movements",
-  //   radio: null,
-  //   comments: "test comment",
-  // }
 
   const finishSegmentHandler = () => {
     const finishTime = props.duration * props.playedFrac;
@@ -139,30 +87,82 @@ const Annotations = (props) => {
 
     const data = {
       segmentID: uuidv4(),
-      timeStartSec: initialAnnotationData.startTimeSec,
-      timeEndSec: finishTime,
+      timeStartSec: +initialAnnotationData.startTimeSec,
+      timeEndSec: +finishTime.toFixed(2),
       categoryName: initialAnnotationData.category,
     };
 
-    // check for overlap
+    console.log(data, "😡");
+
+    // OVERLAP CHECK
     const sameCategoryData = annotations.filter(
-      (annotation) => annotation.categoryName === data.category
+      (annotation) => annotation.categoryName === data.categoryName
     );
 
-    // const segmentEndOverlapData = sameCategoryData.map((segment) => {
-    //   return {
-    //     segmentID: segment.segmentID,
-    //     greaterThanStart: data.timeEndSec > segment.timeStartSec,
-    // CONTINUE HERE
-    //   }
-    // })
+    const segmentEndOverlapData = sameCategoryData.map((segment) => {
+      return {
+        segmentID: segment.segmentID,
+        greaterThanStart: data.timeEndSec > segment.timeStartSec,
+        lessThanEnd: data.timeEndSec < segment.timeEndSec,
+        containsAnotherSegment:
+          data.timeStartSec < segment.timeStartSec &&
+          data.timeEndSec > segment.timeEndSec,
+      };
+    });
+
+    const endOverlapSegments = segmentEndOverlapData.filter(
+      (segment) =>
+        segment.greaterThanStart === true && segment.lessThanEnd === true
+    );
+    const overlappingSegments = segmentEndOverlapData.filter(
+      (segment) => segment.containsAnotherSegment === true
+    );
+
+    if (endOverlapSegments.length > 0) {
+      console.log("segment end overlaps another annotation! 😅");
+      setInitialAnnotationData({
+        category: null,
+        startTimeSec: null,
+      });
+      return;
+    }
+
+    if (overlappingSegments.length > 0) {
+      console.log("segment contains an existing annotation! 😅");
+      setInitialAnnotationData({
+        category: null,
+        startTimeSec: null,
+      });
+      return;
+    }
+
+    if (data.timeEndSec < data.timeStartSec) {
+      console.log("segment end must be greater than start time! 😅");
+      setInitialAnnotationData({
+        category: null,
+        startTimeSec: null,
+      });
+      return;
+    }
+
+    console.log("adding new data to redux annotations!!", data);
+    dispatch(annotationActions.addAnnotation(data));
+    setInitialAnnotationData({
+      category: null,
+      startTimeSec: null,
+    });
   };
 
   const annotationClickHandler = (e) => {
     const id = e.target.closest("div").id;
     console.log(id);
-    setCurrentlySelectedSegment(id);
+    props.setCurrentlySelectedSegment(id);
     dispatch(annotationActions.setCurrentlySelectedSegment(id));
+
+    const annotationStartTime = annotations.filter(
+      (anno) => anno.segmentID === id
+    )[0].timeStartSec;
+    props.seekTo(annotationStartTime);
   };
 
   const numberOfCategories = inputData?.channels.length;
@@ -213,16 +213,42 @@ const Annotations = (props) => {
                 trackWidth *
                 props.zoomLevel;
 
+              // console.log(channel.annotation, "🥓");
+              const channelHasRadio = channel.annotation
+                ?.map((annotation) => {
+                  if (Object.values(annotation).indexOf("radio") > -1) {
+                    return true;
+                  } else {
+                    return false;
+                  }
+                })
+                .includes(true);
+
+              const annotationHasRadioData = annotation.radio;
+
+              // console.log(
+              //   channel.name,
+              //   channelHasRadio,
+              //   annotationHasRadioData,
+              //   "🍴"
+              // );
+
+              const needsMoreWork =
+                channelHasRadio && annotationHasRadioData === null;
+
               return (
                 <div
                   style={{
                     position: "absolute",
                     width: `${width}px`,
                     height: `${250 / numberOfCategories}px`,
-                    backgroundColor: "lightblue",
+                    // backgroundColor: "lightblue",
+                    backgroundColor: `${
+                      needsMoreWork ? "lightcoral" : "lightblue"
+                    }`,
                     left: `${offsetLeft}px`,
                     border: `${
-                      currentlySelectedSegment === annotation.segmentID
+                      props.currentlySelectedSegment === annotation.segmentID
                         ? "3px solid blue"
                         : ""
                     }`,
@@ -233,6 +259,27 @@ const Annotations = (props) => {
                 ></div>
               );
             })}
+
+          {/* start tick */}
+          {initialAnnotationData.category === channel.name ? (
+            <div
+              style={{
+                position: "absolute",
+                width: `2px`,
+                height: `${250 / numberOfCategories}px`,
+                backgroundColor: "black",
+                left: `${
+                  ((initialAnnotationData.startTimeSec -
+                    (props.windowNumber - 1) * props.windowTime) /
+                    props.duration) *
+                  trackWidth *
+                  props.zoomLevel
+                }px`,
+              }}
+            ></div>
+          ) : (
+            ""
+          )}
         </div>
       </div>
     );
@@ -273,14 +320,14 @@ const Annotations = (props) => {
         <div className={classes["timeline"]}>
           <Slider
             min={0}
-            max={0.999}
+            max={1}
             step={0.001}
             value={sliderFrac}
             onMouseDown={mouseDownHandler}
             onMouseUp={mouseUpHandler}
             onChange={sliderChangeHandler}
-            trackStyle={{ display: "none" }}
-            railStyle={{ display: "none" }}
+            // trackStyle={{ display: "none" }}
+            // railStyle={{ display: "none" }}
             handleStyle={{
               border: "2px solid white",
               boxShadow: "none",
@@ -303,69 +350,9 @@ const Annotations = (props) => {
               {timelineValues}
             </div>
           </div>
-
-          {/* TO BE DELETED */}
-          {/* <div
-            onMouseDown={timebarMouseDownHandler}
-            className={classes["timebar"]}
-            style={{
-              left: `${
-                ((props.playedFrac * props.duration -
-                  props.timelineValueRange[0]) /
-                  (props.timelineValueRange[1] - props.timelineValueRange[0])) *
-                  trackWidth -
-                5
-              }px`,
-            }}
-          >
-            <Timebar />
-          </div> */}
-          {/* <div
-            className={classes["time-bar"]}
-            style={{
-              left: `${
-                ((props.playedFrac * props.duration -
-                  props.timelineValueRange[0]) /
-                  (props.timelineValueRange[1] - props.timelineValueRange[0])) *
-                  trackWidth -
-                8
-              }px`,
-            }}
-          >
-            <div className={classes["triangle"]}>
-              <div className={classes["line"]}></div>
-            </div>
-          </div> */}
         </div>
       </div>
-      <div className={classes["annotation-container"]}>
-        {Annotations}
-        {/* <div className={classes["annotation-row"]}>
-          <div className={classes["category-name"]}>
-            <p>category</p>
-          </div>
-          <div className={classes["annotations"]}>
-            <div
-              style={{
-                position: "absolute",
-                width: "43px",
-                height: "10vh",
-                backgroundColor: "blue",
-                left: "70px",
-                zIndex: "999",
-              }}
-            ></div>
-          </div>
-        </div>
-        <div className={classes["annotation-row"]}>
-          <div>category</div>
-          <div className={classes["annotations"]}>annotations</div>
-        </div>
-        <div className={classes["annotation-row"]}>
-          <div>category</div>
-          <div className={classes["annotations"]}>annotations</div>
-        </div> */}
-      </div>
+      <div className={classes["annotation-container"]}>{Annotations}</div>
     </div>
   );
 };

@@ -4,26 +4,9 @@ import Timetick from "../media/Timetick";
 
 import { secondsToMinAndSec } from "../helpers/SecondsTimeFormat";
 
-import classes from "./MiniTimeline2.module.css";
+import classes from "../styles/MiniTimeline2.module.css";
 
 const MiniTimeline2 = (props) => {
-  // const timelineValueRange = useSelector(
-  //   (state) => state.annotation.timelineValueRange
-  // );
-
-  // const zoom = useSelector((state) => state.annotation.zoom);
-
-  // const miniTimelineTicks = [];
-  // const numberOfTicks = 9;
-
-  // if (props.duration !== 0) {
-  //   for (let i = 0; i <= numberOfTicks; i++) {
-  //     miniTimelineTicks.push(0 + (props.duration / numberOfTicks) * i);
-  //   }
-  // }
-
-  // console.log(props.duration, miniTimelineTicks);
-
   const miniTimelineValues = props.miniTimelineTicks.map((timeTick) => {
     return (
       <div className={classes["tick"]} key={timeTick}>
@@ -32,18 +15,6 @@ const MiniTimeline2 = (props) => {
       </div>
     );
   });
-
-  // const sliderChangeHandler = (e) => {
-  //   props.onSliderChange(parseFloat(e.target.value));
-  // };
-
-  // const mouseDownHandler = () => {
-  //   props.onMouseDown();
-  // };
-
-  // const mouseUpHandler = (e) => {
-  //   props.onMouseUp(parseFloat(e.target.value));
-  // };
 
   const sliderChangeHandler = (e) => {
     props.onSliderChange(parseFloat(e));
@@ -59,17 +30,6 @@ const MiniTimeline2 = (props) => {
 
   return (
     <div style={{ marginTop: "8px" }}>
-      {/* <input
-        id="input"
-        type="range"
-        min={0}
-        max={0.999999}
-        step="any"
-        value={props.playedFrac}
-        onMouseDown={mouseDownHandler}
-        onChange={sliderChangeHandler}
-        onMouseUp={mouseUpHandler}
-      /> */}
       <Slider
         min={0}
         max={0.999}
@@ -94,7 +54,6 @@ const MiniTimeline2 = (props) => {
         <div
           className={classes["zone-indicator"]}
           // maybe try to have these as variable first, to make sure that values are there before putting into code? problem is that video duration data takes a little time before it loads
-
           style={{
             left: `${(props.timelineValueRange[0] / props.duration) * 614.4}px`,
             width: `${
@@ -106,11 +65,6 @@ const MiniTimeline2 = (props) => {
           }}
         ></div>
       </div>
-      {/* <div style={{ borderTop: "2px solid black" }}>
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          {miniTimelineValues}
-        </div>
-      </div> */}
     </div>
   );
 };

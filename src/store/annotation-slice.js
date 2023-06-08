@@ -19,7 +19,7 @@ const annotationSlice = createSlice({
         timeEndSec: 142,
         categoryName: "Head movements",
         radio: "Shake",
-        comments: null,
+        comments: "",
       },
       {
         segmentID: "2pvf-tvh2",
@@ -27,7 +27,7 @@ const annotationSlice = createSlice({
         timeEndSec: 224,
         categoryName: "Expressions",
         radio: null,
-        comments: null,
+        comments: "",
       },
       {
         segmentID: "9849-th38",
@@ -35,7 +35,7 @@ const annotationSlice = createSlice({
         timeEndSec: 265,
         categoryName: "QC Problems",
         radio: null,
-        comments: null,
+        comments: "",
       },
       {
         segmentID: "t33t-38fb",
@@ -43,7 +43,7 @@ const annotationSlice = createSlice({
         timeEndSec: 283,
         categoryName: "Speech",
         radio: null,
-        comments: null,
+        comments: "",
       },
     ],
     currentlySelectedSegmentID: null,
@@ -79,6 +79,18 @@ const annotationSlice = createSlice({
       const comment = action.payload;
       state.annotations[state.currentlySelectedSegmentArrayIndex].comments =
         comment;
+    },
+    addAnnotation(state, action) {
+      const data = action.payload;
+      const annotation = {
+        segmentID: data.segmentID,
+        timeStartSec: data.timeStartSec,
+        timeEndSec: data.timeEndSec,
+        categoryName: data.categoryName,
+        radio: null,
+        comments: null,
+      };
+      state.annotations.push(annotation);
     },
   },
 });

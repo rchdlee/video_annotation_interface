@@ -1,7 +1,7 @@
 import Slider, { Handle } from "rc-slider";
 import "rc-slider/assets/index.css";
 import Timetick from "../media/Timetick";
-import classes from "./MiniTimeline4.module.css";
+import classes from "../styles/MiniTimeline4.module.css";
 
 const MiniTimeline4 = (props) => {
   const sliderChangeHandler = (e) => {

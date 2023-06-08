@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useDispatch } from "react-redux";
 import ReactPlayer from "react-player";
 // import "./App.css";
@@ -15,6 +15,7 @@ import { annotationActions } from "./store/annotation-slice";
 import Annotations from "./components/Annotations";
 import MiniTimeline3 from "./components/MiniTimeline3";
 import MiniTimeline4 from "./components/MiniTimeline4";
+import { current } from "@reduxjs/toolkit";
 
 function App() {
   const playerRef = useRef(null);
@@ -71,6 +72,31 @@ function App() {
 
   // console.log(miniTimelineTicks, timelineTicks, timelineValueRange, "🅱");
 
+  // selected segment border
+  const [currentlySelectedSegment, setCurrentlySelectedSegment] =
+    useState(null);
+
+  const escFunction = () => {
+    console.log("esc func 🤑");
+    setCurrentlySelectedSegment(null);
+    dispatch(annotationActions.setCurrentlySelectedSegment(null));
+  };
+
+  const escFunctionWithKey = useCallback((e) => {
+    if (e.key === "Escape") {
+      escFunction();
+    }
+  });
+
+  useEffect(() => {
+    document.addEventListener("keydown", escFunctionWithKey, false);
+
+    return () => {
+      document.removeEventListener("keydown", escFunctionWithKey, false);
+    };
+  }, [escFunctionWithKey]);
+
+  // Handlers
   const zoomOutHandler = () => {
     if (zoom > 1) {
       setZoom((prevState) => prevState - 0.5);
@@ -125,18 +151,32 @@ function App() {
     playerRef.current.seekTo(newTime);
   };
 
-  const handleSeekingTrue = () => {
+  const playHandler = () => {
     setVideoState((prevState) => ({
       ...prevState,
-      seeking: true,
+      playing: true,
     }));
   };
-  const handleSeekingFalse = () => {
+
+  const pauseHandler = () => {
     setVideoState((prevState) => ({
       ...prevState,
-      seeking: false,
+      playing: false,
     }));
   };
+
+  // const handleSeekingTrue = () => {
+  //   setVideoState((prevState) => ({
+  //     ...prevState,
+  //     seeking: true,
+  //   }));
+  // };
+  // const handleSeekingFalse = () => {
+  //   setVideoState((prevState) => ({
+  //     ...prevState,
+  //     seeking: false,
+  //   }));
+  // };
 
   // slider 2
   const updatePlayedFrac = (frac) => {
@@ -241,7 +281,14 @@ function App() {
             playedFrac={videoState.playedFrac}
           />
         </div>
-        <SelectedAnnotation />
+        <SelectedAnnotation
+          deselect={escFunction}
+          currentlySelectedSegment={currentlySelectedSegment}
+          duration={videoState.duration}
+          seekTo={handleSeek}
+          play={playHandler}
+          pause={pauseHandler}
+        />
       </div>
       <div className={classes["bottom-container"]}>
         <Annotations
@@ -258,6 +305,9 @@ function App() {
           onSliderChange={updatePlayedFrac}
           onMouseDown={handleMouseDown}
           onMouseUp={handleMouseUp}
+          seekTo={handleSeek}
+          currentlySelectedSegment={currentlySelectedSegment}
+          setCurrentlySelectedSegment={setCurrentlySelectedSegment}
         />
       </div>
     </div>

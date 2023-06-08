@@ -1,9 +1,11 @@
+import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { annotationActions } from "../store/annotation-slice";
-import classes from "./SelectedAnnotation.module.css";
-import { useState } from "react";
+import classes from "../styles/SelectedAnnotation.module.css";
 
-const SelectedAnnotation = () => {
+import { secondsToMinAndSecDecimal } from "../helpers/SecondsTimeFormat";
+
+const SelectedAnnotation = (props) => {
   const dispatch = useDispatch();
   const annotations = useSelector((state) => state.annotation.annotations);
   const selectedAnnotationIndex = useSelector(
@@ -16,7 +18,8 @@ const SelectedAnnotation = () => {
     (channel) => channel.name === selectedAnnotationCategory
   )[0];
 
-  console.log(annotationInfo, "✅");
+  // to cancel play clip pause on timeout
+  const [isPlayingSegment, setIsPlayingSegment] = useState(false);
 
   const radioOptionsLabel = annotationInfo?.annotation?.filter(
     (anno) => anno.type === "radio"
@@ -29,7 +32,7 @@ const SelectedAnnotation = () => {
     (anno) => anno.type === "textbox"
   )[0]?.label;
 
-  console.log(radioOptionsLabel, radioOptions, textBoxLabel, "👼");
+  // console.log(radioOptionsLabel, radioOptions, textBoxLabel, "👼");
 
   const [isEditingComment, setIsEditingComment] = useState(false);
 
@@ -47,6 +50,33 @@ const SelectedAnnotation = () => {
 
   const finishEditingHandler = () => {
     setIsEditingComment(false);
+  };
+
+  const deselectHandler = () => {
+    console.log("deselecting");
+    props.deselect();
+  };
+
+  const playSegmentHandler = () => {
+    console.log(selectedAnnotation.timeStartSec);
+    const annotationDurationMS =
+      (selectedAnnotation.timeEndSec - selectedAnnotation.timeStartSec) * 1000;
+    props.seekTo(selectedAnnotation.timeStartSec);
+    setIsPlayingSegment(true);
+    props.play();
+    const timeoutID = setTimeout(() => {
+      console.log("pausing!!! 🤖");
+      setIsPlayingSegment(false);
+      props.pause();
+    }, [annotationDurationMS]);
+
+    const cancelTimeout = () => {
+      console.log("cancel timeout 👜");
+      clearTimeout(timeoutID);
+      setIsPlayingSegment(false);
+    };
+    window.addEventListener("mousedown", cancelTimeout);
+    window.addEventListener('keydown', cancelTimeout)
   };
 
   const radioForm = radioOptions
@@ -82,7 +112,16 @@ const SelectedAnnotation = () => {
 
   const textBoxForm2 = textBoxLabel ? (
     <div className={classes["comments"]}>
-      <p>{textBoxLabel}</p>
+      <div>
+        <p>{textBoxLabel}</p>
+        {isEditingComment ? (
+          <button onClick={finishEditingHandler}>Save</button>
+        ) : (
+          <button onClick={editCommentHandler}>
+            {selectedAnnotation?.comments ? "edit comment" : "add comment"}
+          </button>
+        )}
+      </div>
       {isEditingComment ? (
         <input
           type="text"
@@ -94,14 +133,41 @@ const SelectedAnnotation = () => {
           {selectedAnnotation?.comments ? selectedAnnotation?.comments : ""}
         </p>
       )}
-      {isEditingComment ? (
-        <button onClick={finishEditingHandler}>Finish Editing</button>
-      ) : (
-        <button onClick={editCommentHandler}>
-          {selectedAnnotation?.comments ? "edit comment" : "add comment"}
-        </button>
-      )}
     </div>
+  ) : (
+    ""
+  );
+
+  const textBoxForm3 = textBoxLabel ? (
+    <form className={classes["comments"]}>
+      <div className={classes["comment-label-container"]}>
+        <label>{textBoxLabel}</label>
+        {isEditingComment ? (
+          <input
+            type="submit"
+            onClick={finishEditingHandler}
+            value="Save"
+          ></input>
+        ) : (
+          <button onClick={editCommentHandler}>
+            {selectedAnnotation?.comments ? "edit comment" : "add comment"}
+          </button>
+        )}
+      </div>
+      {isEditingComment ? (
+        <input
+          type="text"
+          value={selectedAnnotation?.comments}
+          onChange={textBoxValueChangeHandler}
+          className={classes["edit-input"]}
+        />
+      ) : (
+        <p style={{ marginLeft: "16px" }}>
+          {selectedAnnotation?.comments ? selectedAnnotation?.comments : ""}
+        </p>
+      )}
+      <div style={{ borderBottom: "1px solid black" }}></div>
+    </form>
   ) : (
     ""
   );
@@ -109,8 +175,9 @@ const SelectedAnnotation = () => {
   return (
     <div className={classes["container"]}>
       <div className={classes["inner-container"]}>
-        <div className={classes["deselect"]}>
+        <div className={classes["deselect"]} onClick={deselectHandler}>
           <p>Deselect (esc)</p>
+          {/* {props.currentlySelectedSegment ? <p>Deselect (esc)</p> : ""} */}
         </div>
         <div className={classes["annotation-information"]}>
           <div className={classes["annotation-descriptor"]}>
@@ -123,50 +190,36 @@ const SelectedAnnotation = () => {
           </div>
           <div className={classes["annotation-descriptor"]}>
             <p>Start Time:</p>
-            <p>{selectedAnnotation?.timeStartSec}</p>
+            <p>
+              {selectedAnnotation?.timeStartSec
+                ? secondsToMinAndSecDecimal(selectedAnnotation?.timeStartSec)
+                : ""}
+            </p>
           </div>
           <div className={classes["annotation-descriptor"]}>
             <p>End Time:</p>
-            <p>{selectedAnnotation?.timeEndSec}</p>
+            <p>
+              {selectedAnnotation?.timeEndSec
+                ? secondsToMinAndSecDecimal(selectedAnnotation?.timeEndSec)
+                : ""}
+            </p>
           </div>
         </div>
         <div style={{ borderBottom: "1px solid black" }}></div>
 
-        {/* dynamically generate */}
         <div className={classes["radio-form"]}>
           <p>{radioOptionsLabel}</p>
-          <form>
-            {radioForm}
-            {/* <div className={classes["radio-btn"]}>
-              <label htmlFor="">
-                <input type="radio" value="Nod" checked={true} />
-                Nod
-              </label>
-            </div>
-            <div className={classes["radio-btn"]}>
-              <label htmlFor="">
-                <input type="radio" value="Shake" />
-                Shake
-              </label>
-            </div>
-            <div className={classes["radio-btn"]}>
-              <label htmlFor="">
-                <input type="radio" value="Other" />
-                Other
-              </label>
-            </div> */}
-          </form>
+          <form>{radioForm}</form>
         </div>
 
-        {/* NEED TO FIX` */}
-
-        {textBoxForm2}
-        {/* <div className={classes["comments"]}>
-          <p>Comments:</p>
-          <p>test comment</p>
-          <button>edit comment</button>
-          <input type="text" value="hi" />
-        </div> */}
+        {textBoxForm3}
+        <div>
+          <button onClick={playSegmentHandler} disabled={isPlayingSegment}>
+            Play Segment
+          </button>
+          <button disabled={isPlayingSegment}>Edit Segment</button>
+          <button disabled={isPlayingSegment}>Delete Segment</button>
+        </div>
       </div>
     </div>
   );

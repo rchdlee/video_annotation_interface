@@ -12,14 +12,14 @@ import {
   secondsToMinAndSecDecimal,
 } from "../helpers/SecondsTimeFormat";
 
-import classes from "./PlayerControls.module.css";
+import classes from "../styles/PlayerControls.module.css";
 
 const PlayerControls = (props) => {
   const fps = useSelector((state) => state.annotation.inputData?.fps);
 
-  const videoTimeInfo = `${secondsToMinAndSec(
-    props.playedFrac * props.duration
-  )} / ${secondsToMinAndSec(props.duration)}`;
+  const videoTimeInfo = `${secondsToMinAndSecDecimal(
+    props.playedSec
+  )} / ${secondsToMinAndSecDecimal(props.duration)}`;
 
   return (
     <div className={classes["controls"]}>

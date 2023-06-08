@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import classes from "./MiniTimeline.module.css";
+import classes from "../styles/MiniTimeline.module.css";
 
 const MiniTimeline = (props) => {
   // REMAKE WITH INPUT slider COMPONENT
