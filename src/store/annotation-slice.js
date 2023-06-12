@@ -92,6 +92,10 @@ const annotationSlice = createSlice({
       };
       state.annotations.push(annotation);
     },
+    deleteSelectedAnnotation(state) {
+      const index = state.currentlySelectedSegmentArrayIndex;
+      state.annotations.splice(index, 1);
+    },
   },
 });
 

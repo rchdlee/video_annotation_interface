@@ -136,7 +136,7 @@ const Annotations = (props) => {
       return;
     }
 
-    if (data.timeEndSec < data.timeStartSec) {
+    if (data.timeEndSec <= data.timeStartSec) {
       console.log("segment end must be greater than start time! 😅");
       setInitialAnnotationData({
         category: null,
@@ -175,7 +175,10 @@ const Annotations = (props) => {
           {!isSelectingFinishTime ? (
             <button onClick={startSegmentHandler}>+</button>
           ) : (
-            <button onClick={finishSegmentHandler}>
+            <button
+              onClick={finishSegmentHandler}
+              disabled={channel.name !== initialAnnotationData.category}
+            >
               <FinishIcon />
             </button>
           )}

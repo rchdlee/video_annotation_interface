@@ -76,7 +76,12 @@ const SelectedAnnotation = (props) => {
       setIsPlayingSegment(false);
     };
     window.addEventListener("mousedown", cancelTimeout);
-    window.addEventListener('keydown', cancelTimeout)
+    window.addEventListener("keydown", cancelTimeout);
+  };
+
+  const deleteSegmentHandler = () => {
+    dispatch(annotationActions.deleteSelectedAnnotation());
+    props.deselect();
   };
 
   const radioForm = radioOptions
@@ -218,7 +223,9 @@ const SelectedAnnotation = (props) => {
             Play Segment
           </button>
           <button disabled={isPlayingSegment}>Edit Segment</button>
-          <button disabled={isPlayingSegment}>Delete Segment</button>
+          <button onClick={deleteSegmentHandler} disabled={isPlayingSegment}>
+            Delete Segment
+          </button>
         </div>
       </div>
     </div>
