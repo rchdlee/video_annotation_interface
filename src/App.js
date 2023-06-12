@@ -57,6 +57,7 @@ function App() {
 
   const miniTimelineTicks = [];
   const timelineTicks = [];
+  const newTimelineTicks = [];
 
   if (videoState.duration !== 0) {
     for (let i = 0; i <= numberOfTicks; i++) {
