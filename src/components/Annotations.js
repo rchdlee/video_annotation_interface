@@ -28,8 +28,8 @@ const Annotations = (props) => {
   const trackWidth = 800;
 
   const timelineValues = props.timelineTicks.map((timeTick) => {
-    // only have timeline values if non NaN values in timetick - not sure if this is right though
-    if (props.windowNumber) {
+    // only have timeline values if props.timelineTicks array is filled with actual values
+    if (props.timelineTicks[1] !== 0) {
       return (
         <div style={{ position: "relative" }} key={timeTick}>
           {/* <div style={{ height: "8px", borderLeft: "2px solid black" }}></div> */}
@@ -189,19 +189,31 @@ const Annotations = (props) => {
         >
           {annotations
             .filter((annotation) => annotation.categoryName === channel.name)
+            // .filter(
+            //   (annotation) =>
+            //     (annotation.timeStartSec <
+            //       props.windowNumber * props.windowTime &&
+            //       annotation.timeStartSec >
+            //         (props.windowNumber - 1) * props.windowTime) ||
+            //     (annotation.timeEndSec <
+            //       props.windowNumber * props.windowTime &&
+            //       annotation.timeEndSec >
+            //         (props.windowNumber - 1) * props.windowTime) ||
+            //     (annotation.timeStartSec <
+            //       (props.windowNumber - 1) * props.windowTime &&
+            //       annotation.timeEndSec > props.windowNumber * props.windowTime)
+            // )
             .filter(
               (annotation) =>
-                (annotation.timeStartSec <
-                  props.windowNumber * props.windowTime &&
-                  annotation.timeStartSec >
-                    (props.windowNumber - 1) * props.windowTime) ||
-                (annotation.timeEndSec <
-                  props.windowNumber * props.windowTime &&
-                  annotation.timeEndSec >
-                    (props.windowNumber - 1) * props.windowTime) ||
-                (annotation.timeStartSec <
-                  (props.windowNumber - 1) * props.windowTime &&
-                  annotation.timeEndSec > props.windowNumber * props.windowTime)
+                (annotation.timeStartSec > props.timelineTicks[0] &&
+                  annotation.timeStartSec <
+                    props.timelineTicks[props.numberOfTicks]) ||
+                (annotation.timeEndSec > props.timelineTicks[0] &&
+                  annotation.timeEndSec <
+                    props.timelineTicks[props.numberOfTicks]) ||
+                (annotation.timeStartSec > props.timelineTicks[0] &&
+                  annotation.timeEndSec <
+                    props.timelineTicks[props.numberOfTicks])
             )
             .map((annotation) => {
               const width =
@@ -209,9 +221,14 @@ const Annotations = (props) => {
                   props.duration) *
                 trackWidth *
                 props.zoomLevel;
+              // const offsetLeft =
+              //   ((annotation.timeStartSec -
+              //     (props.windowNumber - 1) * props.windowTime) /
+              //     props.duration) *
+              //   trackWidth *
+              //   props.zoomLevel;
               const offsetLeft =
-                ((annotation.timeStartSec -
-                  (props.windowNumber - 1) * props.windowTime) /
+                ((annotation.timeStartSec - props.timelineTicks[0]) /
                   props.duration) *
                 trackWidth *
                 props.zoomLevel;
@@ -319,6 +336,7 @@ const Annotations = (props) => {
           <button onClick={props.zoomOut}>zoom out</button>
           <button onClick={props.zoomIn}>zoom in</button>
           <button onClick={props.resetZoom}>reset zoom</button>
+          <p>zoom: {props.zoomLevel}</p>
         </div>
         <div className={classes["timeline"]}>
           <Slider

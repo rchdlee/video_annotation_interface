@@ -50,14 +50,21 @@ function App() {
 
   // timeline
   const [zoom, setZoom] = useState(1);
+  const zoomIncrement = 1;
   const numberOfTicks = 9;
   const windowTime = videoState.duration / zoom;
-  const windowNumber = Math.trunc(videoState.playedSec / windowTime) + 1;
+  const initialTickInterval = videoState.duration / numberOfTicks;
   const tickInterval = windowTime / numberOfTicks;
 
+  //  DELETED WINDOWNUMBER
+  const windowNumber = Math.trunc(videoState.playedSec / windowTime) + 1;
+
   const miniTimelineTicks = [];
-  const timelineTicks = [];
-  const newTimelineTicks = [];
+  const initialTimelineTicks = [];
+  // const zoomTimelineTicks = [];
+  const [zoomTimelineTicks, setZoomTimelineTicks] = useState([]);
+
+  const timelineTicks = zoom === 1 ? initialTimelineTicks : zoomTimelineTicks;
 
   if (videoState.duration !== 0) {
     for (let i = 0; i <= numberOfTicks; i++) {
@@ -66,12 +73,141 @@ function App() {
   }
 
   for (let i = 0; i <= numberOfTicks; i++) {
-    timelineTicks.push(windowTime * (windowNumber - 1) + i * tickInterval);
+    initialTimelineTicks.push(i * initialTickInterval);
+  }
+
+  console.log(
+    timelineTicks[0],
+    timelineTicks[numberOfTicks],
+    timelineTicks,
+    "🍜"
+  );
+
+  const calculateZoomTimelineTicks = (method, offset) => {
+    let tickIntervalTest;
+    // let offset;
+    switch (method) {
+      case "zoomin":
+        tickIntervalTest =
+          videoState.duration / ((zoom + zoomIncrement) * numberOfTicks);
+        break;
+      case "zoomout":
+        tickIntervalTest =
+          videoState.duration / ((zoom - zoomIncrement) * numberOfTicks);
+        break;
+      case "recalculate":
+        tickIntervalTest = videoState.duration / (zoom * numberOfTicks);
+        break;
+    }
+
+    // switch (method) {
+    //   case "zoomin":
+    //   case "zoomout":
+    //     offset = -4;
+    //     break;
+    //   case "recalculate":
+    //     offset = -1;
+    //     break;
+    // }
+
+    // console.log(tickIntervalTest, "🌭");
+
+    // const tickIntervalTest =
+    //   videoState.duration / ((zoom + zoomIncrement) * numberOfTicks);
+
+    const zoomTimelineTicksTest = [];
+    const initialTime = videoState.playedSec - 4 * tickIntervalTest;
+    const finalTime = videoState.playedSec + 5 * tickIntervalTest;
+    // console.log(
+    //   "recalculating timeline ticks 🧃",
+    //   videoState.playedSec,
+    //   initialTime,
+    //   finalTime
+    // );
+
+    if (initialTime < 0) {
+      console.log("calculate zoom IN set initial as 0");
+      for (let i = 0; i <= numberOfTicks; i++) {
+        zoomTimelineTicksTest.push(
+          // (i * videoState.duration) / ((zoom + zoomIncrement) * numberOfTicks)
+          i * tickIntervalTest
+        );
+      }
+      console.log(zoomTimelineTicksTest);
+      setZoomTimelineTicks(zoomTimelineTicksTest);
+    }
+    if (finalTime > videoState.duration) {
+      console.log("calculate zoom IN set max value as video duration");
+
+      for (let i = 0; i <= numberOfTicks; i++) {
+        zoomTimelineTicksTest.push(
+          // ((i - numberOfTicks) * videoState.duration) /
+          //   ((zoom + zoomIncrement) * numberOfTicks) +
+          //   videoState.duration
+
+          (i - numberOfTicks) * tickIntervalTest + videoState.duration
+        );
+        setZoomTimelineTicks(zoomTimelineTicksTest);
+      }
+    }
+    if (initialTime > 0 && finalTime < videoState.duration) {
+      console.log("calculate zoom IN as normal");
+
+      for (let i = 0; i <= numberOfTicks; i++) {
+        zoomTimelineTicksTest.push(
+          // videoState.playedSec + (i - 4) * tickIntervalTest
+          videoState.playedSec + (i - offset) * tickIntervalTest
+        );
+      }
+      setZoomTimelineTicks(zoomTimelineTicksTest);
+    }
+  };
+
+  if (zoom > 1 && videoState.playedSec > timelineTicks[numberOfTicks] - 1) {
+    calculateZoomTimelineTicks("recalculate", 7);
+  }
+
+  if (
+    zoom > 1 &&
+    videoState.playedSec > 0 &&
+    videoState.playedSec < timelineTicks[0] + 1
+  ) {
+    console.log("recalculating to prev 🥟");
+    calculateZoomTimelineTicks("recalculate", 2);
   }
 
   const timelineValueRange = [timelineTicks[0], timelineTicks[numberOfTicks]];
 
   // console.log(miniTimelineTicks, timelineTicks, timelineValueRange, "🅱");
+  // console.log(
+  //   initialTickInterval,
+  //   windowTime,
+  //   tickInterval,
+  //   initialTimelineTicks,
+  //   zoomTimelineTicks,
+  //   timelineTicks,
+  //   "🍣"
+  // );
+
+  // Handlers
+  const zoomOutHandler = () => {
+    if (zoom > 1) {
+      setZoom((prevState) => prevState - zoomIncrement);
+      // calculateZoomOutTimelineTicks();
+      calculateZoomTimelineTicks("zoomout", 4);
+    }
+  };
+
+  const zoomInHandler = () => {
+    setZoom((prevState) => prevState + zoomIncrement);
+    // calculateZoomInTimelineTicks();
+    calculateZoomTimelineTicks("zoomin", 4);
+  };
+
+  const resetZoomHandler = () => {
+    setZoom(1);
+  };
+  //
 
   // selected segment border
   const [currentlySelectedSegment, setCurrentlySelectedSegment] =
@@ -96,22 +232,6 @@ function App() {
       document.removeEventListener("keydown", escFunctionWithKey, false);
     };
   }, [escFunctionWithKey]);
-
-  // Handlers
-  const zoomOutHandler = () => {
-    if (zoom > 1) {
-      setZoom((prevState) => prevState - 0.5);
-    }
-  };
-
-  const zoomInHandler = () => {
-    setZoom((prevState) => prevState + 0.5);
-  };
-
-  const resetZoomHandler = () => {
-    setZoom(1);
-  };
-  //
 
   const handleProgress = (state) => {
     const { loaded, loadedSeconds, played, playedSeconds } = state;
@@ -294,6 +414,7 @@ function App() {
       <div className={classes["bottom-container"]}>
         <Annotations
           timelineTicks={timelineTicks}
+          numberOfTicks={numberOfTicks}
           windowNumber={windowNumber}
           windowTime={windowTime}
           zoomLevel={zoom}
