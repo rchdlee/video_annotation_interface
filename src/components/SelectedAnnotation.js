@@ -3,7 +3,12 @@ import { useSelector, useDispatch } from "react-redux";
 import { annotationActions } from "../store/annotation-slice";
 import classes from "../styles/SelectedAnnotation.module.css";
 
+import PlayCircle from "../media/icons/playcircle.svg";
+import TrashIcon from "../media/icons/trashicon.svg";
+import PenIcon from "../media/icons/pen-icon.svg";
+
 import { secondsToMinAndSecDecimal } from "../helpers/SecondsTimeFormat";
+import { validateFinishedAnnotation } from "../helpers/AnnotationValidation";
 
 const SelectedAnnotation = (props) => {
   const dispatch = useDispatch();
@@ -84,6 +89,73 @@ const SelectedAnnotation = (props) => {
     props.deselect();
   };
 
+  const editSegmentStartHandler = () => {
+    console.log("editing start");
+    const newStartTime = props.playedSec;
+    const isValidated = validateFinishedAnnotation(
+      annotations,
+      selectedAnnotationCategory,
+      newStartTime,
+      selectedAnnotation.timeEndSec,
+      "start",
+      selectedAnnotation.segmentID
+    );
+
+    if (!isValidated) {
+      return;
+    }
+
+    dispatch(annotationActions.editSelectedAnnotationStartTime(newStartTime));
+  };
+
+  const editSegmentEndHandler = () => {
+    console.log("editing end");
+    const newEndTime = props.playedSec;
+    const isValidated = validateFinishedAnnotation(
+      annotations,
+      selectedAnnotationCategory,
+      selectedAnnotation.timeStartSec,
+      newEndTime,
+      "end",
+      selectedAnnotation.segmentID
+    );
+
+    if (!isValidated) {
+      return;
+    }
+    dispatch(annotationActions.editSelectedAnnotationEndTime(newEndTime));
+  };
+
+  const annotationSubmitHandler = () => {
+    const annotationsNeedMoreWork = annotations.map((annotation) => {
+      if (annotation.channelHasRadio && annotation.radio === null) {
+        return true;
+      } else {
+        return false;
+      }
+    });
+    const numberOfAnnosThatNeedWork = annotationsNeedMoreWork.filter(
+      (bool) => bool === true
+    ).length;
+
+    console.log(annotationsNeedMoreWork);
+
+    if (annotationsNeedMoreWork.includes(true)) {
+      alert(
+        `${numberOfAnnosThatNeedWork} annotations still need radio button data to be filled`
+      );
+      return;
+    }
+
+    const annotationData = {
+      path: inputData.path,
+      annotations: annotations,
+    };
+    const annotationDataJSON = JSON.stringify(annotationData);
+    console.log(annotationDataJSON);
+    alert(`successfully submitted data! ${annotationDataJSON}`);
+  };
+
   const radioForm = radioOptions
     ? radioOptions.map((option) => {
         return (
@@ -103,47 +175,6 @@ const SelectedAnnotation = (props) => {
     : "";
 
   const textBoxForm = textBoxLabel ? (
-    <div className={classes["comments"]}>
-      <p>{textBoxLabel}</p>
-      <input
-        type="text"
-        value={selectedAnnotation?.comments}
-        onChange={textBoxValueChangeHandler}
-      />
-    </div>
-  ) : (
-    ""
-  );
-
-  const textBoxForm2 = textBoxLabel ? (
-    <div className={classes["comments"]}>
-      <div>
-        <p>{textBoxLabel}</p>
-        {isEditingComment ? (
-          <button onClick={finishEditingHandler}>Save</button>
-        ) : (
-          <button onClick={editCommentHandler}>
-            {selectedAnnotation?.comments ? "edit comment" : "add comment"}
-          </button>
-        )}
-      </div>
-      {isEditingComment ? (
-        <input
-          type="text"
-          value={selectedAnnotation?.comments}
-          onChange={textBoxValueChangeHandler}
-        />
-      ) : (
-        <p style={{ marginLeft: "16px" }}>
-          {selectedAnnotation?.comments ? selectedAnnotation?.comments : ""}
-        </p>
-      )}
-    </div>
-  ) : (
-    ""
-  );
-
-  const textBoxForm3 = textBoxLabel ? (
     <form className={classes["comments"]}>
       <div className={classes["comment-label-container"]}>
         <label>{textBoxLabel}</label>
@@ -168,10 +199,11 @@ const SelectedAnnotation = (props) => {
         />
       ) : (
         <p style={{ marginLeft: "16px" }}>
-          {selectedAnnotation?.comments ? selectedAnnotation?.comments : ""}
+          {selectedAnnotation?.comments
+            ? selectedAnnotation?.comments
+            : "[empty]"}
         </p>
       )}
-      <div style={{ borderBottom: "1px solid black" }}></div>
     </form>
   ) : (
     ""
@@ -179,55 +211,97 @@ const SelectedAnnotation = (props) => {
 
   return (
     <div className={classes["container"]}>
-      <div className={classes["inner-container"]}>
-        <div className={classes["deselect"]} onClick={deselectHandler}>
-          <p>Deselect (esc)</p>
-          {/* {props.currentlySelectedSegment ? <p>Deselect (esc)</p> : ""} */}
-        </div>
-        <div className={classes["annotation-information"]}>
-          <div className={classes["annotation-descriptor"]}>
-            <p>Annotation ID:</p>
-            <p>{selectedAnnotation?.segmentID}</p>
+      {props.currentlySelectedSegment ? (
+        <div className={classes["inner-container"]}>
+          <div className={classes["deselect"]} onClick={deselectHandler}>
+            <p>Deselect (esc)</p>
+            {/* {props.currentlySelectedSegment ? <p>Deselect (esc)</p> : ""} */}
           </div>
-          <div className={classes["annotation-descriptor"]}>
-            <p>Category:</p>
-            <p>{selectedAnnotation?.categoryName}</p>
+          <div className={classes["annotation-information"]}>
+            <div className={classes["annotation-descriptor"]}>
+              <p>Annotation ID:</p>
+              <p>{selectedAnnotation?.segmentID}</p>
+            </div>
+            <div className={classes["annotation-descriptor"]}>
+              <p>Category:</p>
+              <p>{selectedAnnotation?.categoryName}</p>
+            </div>
+            <div className={classes["annotation-descriptor"]}>
+              <p>Start Time:</p>
+              <p>
+                {selectedAnnotation?.timeStartSec
+                  ? secondsToMinAndSecDecimal(selectedAnnotation?.timeStartSec)
+                  : ""}
+              </p>
+            </div>
+            <div className={classes["annotation-descriptor"]}>
+              <p>End Time:</p>
+              <p>
+                {selectedAnnotation?.timeEndSec
+                  ? secondsToMinAndSecDecimal(selectedAnnotation?.timeEndSec)
+                  : ""}
+              </p>
+            </div>
           </div>
-          <div className={classes["annotation-descriptor"]}>
-            <p>Start Time:</p>
-            <p>
-              {selectedAnnotation?.timeStartSec
-                ? secondsToMinAndSecDecimal(selectedAnnotation?.timeStartSec)
-                : ""}
-            </p>
-          </div>
-          <div className={classes["annotation-descriptor"]}>
-            <p>End Time:</p>
-            <p>
-              {selectedAnnotation?.timeEndSec
-                ? secondsToMinAndSecDecimal(selectedAnnotation?.timeEndSec)
-                : ""}
-            </p>
-          </div>
-        </div>
-        <div style={{ borderBottom: "1px solid black" }}></div>
+          <div style={{ borderBottom: "1px solid black" }}></div>
 
-        <div className={classes["radio-form"]}>
-          <p>{radioOptionsLabel}</p>
-          <form>{radioForm}</form>
-        </div>
+          <div className={classes["radio-form"]}>
+            <p>{radioOptionsLabel}</p>
+            <form>{radioForm}</form>
+          </div>
 
-        {textBoxForm3}
-        <div>
-          <button onClick={playSegmentHandler} disabled={isPlayingSegment}>
-            Play Segment
-          </button>
-          <button disabled={isPlayingSegment}>Edit Segment</button>
-          <button onClick={deleteSegmentHandler} disabled={isPlayingSegment}>
-            Delete Segment
-          </button>
+          {textBoxForm}
+
+          <div className={classes["button-container"]}>
+            <button
+              onClick={editSegmentStartHandler}
+              disabled={isPlayingSegment}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "8px",
+              }}
+              title="Set New Start Time"
+            >
+              {/* Set New Start */}
+              <img src={PenIcon} alt="" />
+              <p style={{ fontSize: "18px" }}>[</p>
+            </button>
+            <button
+              onClick={editSegmentEndHandler}
+              disabled={isPlayingSegment}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "8px",
+              }}
+              title="Set New End Time"
+            >
+              {/* Set New End */}
+              <img src={PenIcon} alt="" />
+              <p style={{ fontSize: "18px" }}>]</p>
+            </button>
+            <button
+              onClick={playSegmentHandler}
+              disabled={isPlayingSegment}
+              title="Play Clip"
+            >
+              <img src={PlayCircle} alt="" />
+            </button>
+            <button
+              onClick={deleteSegmentHandler}
+              disabled={isPlayingSegment}
+              title="Delete Annotation"
+            >
+              <img src={TrashIcon} alt="" />
+            </button>
+          </div>
         </div>
-      </div>
+      ) : (
+        <button onClick={annotationSubmitHandler}>submit</button>
+      )}
     </div>
   );
 };

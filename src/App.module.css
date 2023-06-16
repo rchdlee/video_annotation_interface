@@ -25,3 +25,7 @@
   height: 35vh;
   margin-top: 18px;
 }
+
+body {
+  background-color: rgb(246, 246, 246);
+}

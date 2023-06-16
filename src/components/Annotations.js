@@ -9,7 +9,15 @@ import classes from "../styles/Annotations.module.css";
 // import Timebar from "../media/timebar.svg";
 import Timebar from "../media/Timebar";
 import FinishIcon from "../media/FinishIcon";
+import ZoomInIcon from "../media/icons/zoom-in.svg";
+import ZoomOutIcon from "../media/icons/zoom-out.svg";
+import ClipIcon from "../media/icons/clip.svg";
+import ResetIcon from "../media/icons/reset.svg";
 import { secondsToMinAndSecDecimal } from "../helpers/SecondsTimeFormat";
+import {
+  validateAnnotationStart,
+  validateFinishedAnnotation,
+} from "../helpers/AnnotationValidation";
 
 const Annotations = (props) => {
   //
@@ -45,39 +53,61 @@ const Annotations = (props) => {
   });
 
   const startSegmentHandler = (e) => {
+    props.escFunction();
     const category = e.target.closest("div").id;
-    const startTime = props.duration * props.playedFrac;
-    console.log(category, startTime, "🧩");
+    // const startTime = props.duration * props.playedFrac;
+    const startTime = props.playedSec;
+    // console.log(category, startTime, "🧩");
+
+    const isValidated = validateAnnotationStart(
+      annotations,
+      category,
+      startTime
+    );
 
     // OVERLAP CHECK
-    const sameCategoryData = annotations.filter(
-      (segment) => segment.categoryName === category
-    );
+    // const sameCategoryData = annotations.filter(
+    //   (segment) => segment.categoryName === category
+    // );
 
-    const startSegmentOverlapData = sameCategoryData.map((segment) => {
-      return {
-        segmentID: segment.segmentID,
-        greaterThanStart: startTime > segment.timeStartSec,
-        lessThanEnd: startTime < segment.timeEndSec,
-      };
-    });
+    // const startSegmentOverlapData = sameCategoryData.map((segment) => {
+    //   return {
+    //     segmentID: segment.segmentID,
+    //     greaterThanStart: startTime > segment.timeStartSec,
+    //     lessThanEnd: startTime < segment.timeEndSec,
+    //   };
+    // });
 
-    const startOverlapSegments = startSegmentOverlapData.filter(
-      (segment) =>
-        segment.greaterThanStart === true && segment.lessThanEnd === true
-    );
+    // const startOverlapSegments = startSegmentOverlapData.filter(
+    //   (segment) =>
+    //     segment.greaterThanStart === true && segment.lessThanEnd === true
+    // );
 
-    if (startOverlapSegments.length > 0) {
-      console.log("start segment is inside another segment ❌");
+    // if (startOverlapSegments.length > 0) {
+    //   console.log("start segment is inside another segment ❌");
+    //   return;
+    // } else {
+    //   setInitialAnnotationData((prevState) => ({
+    //     ...prevState,
+    //     category: category,
+    //     startTimeSec: startTime.toFixed(2),
+    //   }));
+    //   setIsSelectingFinishTime(true);
+    // }
+
+    if (!isValidated) {
+      // ERROR ALERT MODAL
+      // console.log("start segment is inside another segment ❌❌");
       return;
-    } else {
-      setInitialAnnotationData((prevState) => ({
-        ...prevState,
-        category: category,
-        startTimeSec: startTime.toFixed(2),
-      }));
-      setIsSelectingFinishTime(true);
     }
+    // if (isValidated) {
+    setInitialAnnotationData((prevState) => ({
+      ...prevState,
+      category: category,
+      startTimeSec: startTime.toFixed(2),
+    }));
+    setIsSelectingFinishTime(true);
+    // }
   };
 
   const finishSegmentHandler = () => {
@@ -85,72 +115,116 @@ const Annotations = (props) => {
     setIsSelectingFinishTime(false);
     console.log(finishTime);
 
+    // for channelHasRadio and segment color logic
+    const annotationChannelInfo = inputData.channels.filter(
+      (channel) => channel.name === initialAnnotationData.category
+    );
+    const channelHasRadio = annotationChannelInfo[0].annotation
+      ? annotationChannelInfo[0].annotation
+          ?.map((annotation) => {
+            if (Object.values(annotation).indexOf("radio") > -1) {
+              return true;
+            } else {
+              return false;
+            }
+          })
+          .includes(true)
+      : false;
+
+    console.log(annotationChannelInfo[0], channelHasRadio, "🧇");
+    //
+
     const data = {
       segmentID: uuidv4(),
       timeStartSec: +initialAnnotationData.startTimeSec,
       timeEndSec: +finishTime.toFixed(2),
       categoryName: initialAnnotationData.category,
+      channelHasRadio: channelHasRadio,
     };
+
+    const isValidated = validateFinishedAnnotation(
+      annotations,
+      data.categoryName,
+      data.timeStartSec,
+      data.timeEndSec,
+      "end"
+    );
 
     console.log(data, "😡");
 
     // OVERLAP CHECK
-    const sameCategoryData = annotations.filter(
-      (annotation) => annotation.categoryName === data.categoryName
-    );
+    // const sameCategoryData = annotations.filter(
+    //   (annotation) => annotation.categoryName === data.categoryName
+    // );
 
-    const segmentEndOverlapData = sameCategoryData.map((segment) => {
-      return {
-        segmentID: segment.segmentID,
-        greaterThanStart: data.timeEndSec > segment.timeStartSec,
-        lessThanEnd: data.timeEndSec < segment.timeEndSec,
-        containsAnotherSegment:
-          data.timeStartSec < segment.timeStartSec &&
-          data.timeEndSec > segment.timeEndSec,
-      };
-    });
+    // const segmentEndOverlapData = sameCategoryData.map((segment) => {
+    //   return {
+    //     segmentID: segment.segmentID,
+    //     greaterThanStart: data.timeEndSec > segment.timeStartSec,
+    //     lessThanEnd: data.timeEndSec < segment.timeEndSec,
+    //     containsAnotherSegment:
+    //       data.timeStartSec < segment.timeStartSec &&
+    //       data.timeEndSec > segment.timeEndSec,
+    //   };
+    // });
 
-    const endOverlapSegments = segmentEndOverlapData.filter(
-      (segment) =>
-        segment.greaterThanStart === true && segment.lessThanEnd === true
-    );
-    const overlappingSegments = segmentEndOverlapData.filter(
-      (segment) => segment.containsAnotherSegment === true
-    );
+    // const endOverlapSegments = segmentEndOverlapData.filter(
+    //   (segment) =>
+    //     segment.greaterThanStart === true && segment.lessThanEnd === true
+    // );
+    // const overlappingSegments = segmentEndOverlapData.filter(
+    //   (segment) => segment.containsAnotherSegment === true
+    // );
 
-    if (endOverlapSegments.length > 0) {
-      console.log("segment end overlaps another annotation! 😅");
+    // if (endOverlapSegments.length > 0) {
+    //   console.log("segment end overlaps another annotation! 😅");
+    //   setInitialAnnotationData({
+    //     category: null,
+    //     startTimeSec: null,
+    //   });
+    //   return;
+    // }
+
+    // if (overlappingSegments.length > 0) {
+    //   console.log("segment contains an existing annotation! 😅");
+    //   setInitialAnnotationData({
+    //     category: null,
+    //     startTimeSec: null,
+    //   });
+    //   return;
+    // }
+
+    // if (data.timeEndSec <= data.timeStartSec) {
+    //   console.log("segment end must be greater than start time! 😅");
+    //   setInitialAnnotationData({
+    //     category: null,
+    //     startTimeSec: null,
+    //   });
+    //   return;
+    // }
+
+    // console.log("adding new data to redux annotations!!", data);
+    // dispatch(annotationActions.addAnnotation(data));
+    // setInitialAnnotationData({
+    //   category: null,
+    //   startTimeSec: null,
+    // });
+
+    if (!isValidated) {
       setInitialAnnotationData({
         category: null,
         startTimeSec: null,
       });
       return;
     }
-
-    if (overlappingSegments.length > 0) {
-      console.log("segment contains an existing annotation! 😅");
-      setInitialAnnotationData({
-        category: null,
-        startTimeSec: null,
-      });
-      return;
-    }
-
-    if (data.timeEndSec <= data.timeStartSec) {
-      console.log("segment end must be greater than start time! 😅");
-      setInitialAnnotationData({
-        category: null,
-        startTimeSec: null,
-      });
-      return;
-    }
-
+    // if (isValidated) {
     console.log("adding new data to redux annotations!!", data);
     dispatch(annotationActions.addAnnotation(data));
     setInitialAnnotationData({
       category: null,
       startTimeSec: null,
     });
+    // }
   };
 
   const annotationClickHandler = (e) => {
@@ -173,7 +247,9 @@ const Annotations = (props) => {
         <div className={classes["category-name"]} id={channel.name}>
           <p>{channel.name}</p>
           {!isSelectingFinishTime ? (
-            <button onClick={startSegmentHandler}>+</button>
+            <button onClick={startSegmentHandler}>
+              <img src={ClipIcon} alt="" />
+            </button>
           ) : (
             <button
               onClick={finishSegmentHandler}
@@ -189,20 +265,7 @@ const Annotations = (props) => {
         >
           {annotations
             .filter((annotation) => annotation.categoryName === channel.name)
-            // .filter(
-            //   (annotation) =>
-            //     (annotation.timeStartSec <
-            //       props.windowNumber * props.windowTime &&
-            //       annotation.timeStartSec >
-            //         (props.windowNumber - 1) * props.windowTime) ||
-            //     (annotation.timeEndSec <
-            //       props.windowNumber * props.windowTime &&
-            //       annotation.timeEndSec >
-            //         (props.windowNumber - 1) * props.windowTime) ||
-            //     (annotation.timeStartSec <
-            //       (props.windowNumber - 1) * props.windowTime &&
-            //       annotation.timeEndSec > props.windowNumber * props.windowTime)
-            // )
+
             .filter(
               (annotation) =>
                 (annotation.timeStartSec > props.timelineTicks[0] &&
@@ -221,12 +284,7 @@ const Annotations = (props) => {
                   props.duration) *
                 trackWidth *
                 props.zoomLevel;
-              // const offsetLeft =
-              //   ((annotation.timeStartSec -
-              //     (props.windowNumber - 1) * props.windowTime) /
-              //     props.duration) *
-              //   trackWidth *
-              //   props.zoomLevel;
+
               const offsetLeft =
                 ((annotation.timeStartSec - props.timelineTicks[0]) /
                   props.duration) *
@@ -234,15 +292,17 @@ const Annotations = (props) => {
                 props.zoomLevel;
 
               // console.log(channel.annotation, "🥓");
-              const channelHasRadio = channel.annotation
-                ?.map((annotation) => {
-                  if (Object.values(annotation).indexOf("radio") > -1) {
-                    return true;
-                  } else {
-                    return false;
-                  }
-                })
-                .includes(true);
+              // const channelHasRadio = channel.annotation
+              //   ?.map((annotation) => {
+              //     if (Object.values(annotation).indexOf("radio") > -1) {
+              //       return true;
+              //     } else {
+              //       return false;
+              //     }
+              //   })
+              //   .includes(true);
+
+              const channelHasRadio = annotation.channelHasRadio;
 
               const annotationHasRadioData = annotation.radio;
 
@@ -272,9 +332,11 @@ const Annotations = (props) => {
                         ? "3px solid blue"
                         : ""
                     }`,
+                    zIndex: 2,
                   }}
                   key={annotation.segmentID}
                   id={annotation.segmentID}
+                  className={classes["annotation"]}
                   onClick={annotationClickHandler}
                 ></div>
               );
@@ -333,10 +395,32 @@ const Annotations = (props) => {
     <div>
       <div className={classes["timeline-container"]}>
         <div className={classes["top-left-container"]}>
-          <button onClick={props.zoomOut}>zoom out</button>
-          <button onClick={props.zoomIn}>zoom in</button>
-          <button onClick={props.resetZoom}>reset zoom</button>
-          <p>zoom: {props.zoomLevel}</p>
+          <button
+            onClick={props.zoomOut}
+            disabled={props.zoomLevel === 1}
+            style={{ opacity: `${props.zoomLevel === 1 ? 0.5 : 1}` }}
+            title="Zoom Out"
+          >
+            <img src={ZoomOutIcon} alt="" />
+          </button>
+          <button onClick={props.zoomIn} title="Zoom In">
+            <img src={ZoomInIcon} alt="" />
+          </button>
+          <button
+            onClick={props.resetZoom}
+            // disabled={props.zoomLevel === 1}
+            style={{ opacity: `${props.zoomLevel === 1 ? 0 : 1}` }}
+            title="Reset Zoom"
+          >
+            <img
+              src={ResetIcon}
+              style={{
+                transform: "scale(1, -1)",
+              }}
+              alt=""
+            />
+          </button>
+          {/* <p>zoom: {props.zoomLevel}</p> */}
         </div>
         <div className={classes["timeline"]}>
           <Slider
@@ -347,12 +431,13 @@ const Annotations = (props) => {
             onMouseDown={mouseDownHandler}
             onMouseUp={mouseUpHandler}
             onChange={sliderChangeHandler}
-            // trackStyle={{ display: "none" }}
-            // railStyle={{ display: "none" }}
+            trackStyle={{ display: "none" }}
+            railStyle={{ display: "none" }}
             handleStyle={{
               border: "2px solid white",
               boxShadow: "none",
               zIndex: 999,
+              // zIndex: `${props.currentlySelectedSegment ? 1 : 999}`,
             }}
             handle={(handleProps) => {
               return (

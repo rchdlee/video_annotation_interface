@@ -12,6 +12,7 @@ const annotationSlice = createSlice({
         categoryName: "Head movements",
         radio: null,
         comments: "test comment",
+        channelHasRadio: true,
       },
       {
         segmentID: "2f2t-3tku",
@@ -20,6 +21,7 @@ const annotationSlice = createSlice({
         categoryName: "Head movements",
         radio: "Shake",
         comments: "",
+        channelHasRadio: true,
       },
       {
         segmentID: "2pvf-tvh2",
@@ -28,6 +30,7 @@ const annotationSlice = createSlice({
         categoryName: "Expressions",
         radio: null,
         comments: "",
+        channelHasRadio: true,
       },
       {
         segmentID: "9849-th38",
@@ -36,6 +39,7 @@ const annotationSlice = createSlice({
         categoryName: "QC Problems",
         radio: null,
         comments: "",
+        channelHasRadio: false,
       },
       {
         segmentID: "t33t-38fb",
@@ -44,6 +48,7 @@ const annotationSlice = createSlice({
         categoryName: "Speech",
         radio: null,
         comments: "",
+        channelHasRadio: false,
       },
     ],
     currentlySelectedSegmentID: null,
@@ -82,6 +87,7 @@ const annotationSlice = createSlice({
     },
     addAnnotation(state, action) {
       const data = action.payload;
+
       const annotation = {
         segmentID: data.segmentID,
         timeStartSec: data.timeStartSec,
@@ -89,12 +95,23 @@ const annotationSlice = createSlice({
         categoryName: data.categoryName,
         radio: null,
         comments: null,
+        channelHasRadio: data.channelHasRadio,
       };
       state.annotations.push(annotation);
     },
     deleteSelectedAnnotation(state) {
       const index = state.currentlySelectedSegmentArrayIndex;
       state.annotations.splice(index, 1);
+    },
+    editSelectedAnnotationStartTime(state, action) {
+      const newStartTimeSec = action.payload;
+      const index = state.currentlySelectedSegmentArrayIndex;
+      state.annotations[index].timeStartSec = newStartTimeSec;
+    },
+    editSelectedAnnotationEndTime(state, action) {
+      const newEndTimeSec = action.payload;
+      const index = state.currentlySelectedSegmentArrayIndex;
+      state.annotations[index].timeEndSec = newEndTimeSec;
     },
   },
 });

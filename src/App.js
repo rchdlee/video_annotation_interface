@@ -4,17 +4,14 @@ import ReactPlayer from "react-player";
 // import "./App.css";
 import classes from "./App.module.css";
 
-import MiniTimeline from "./components/MiniTimeline";
 import SelectedAnnotation from "./components/SelectedAnnotation";
 import PlayerControls from "./components/PlayerControls";
-import MiniTimeline2 from "./components/MiniTimeline2";
+import MiniTimeline2 from "./components/MiniTimeline";
 
 import clip from "./media/lexclip.mp4";
 import inputData from "./media/input.json";
 import { annotationActions } from "./store/annotation-slice";
 import Annotations from "./components/Annotations";
-import MiniTimeline3 from "./components/MiniTimeline3";
-import MiniTimeline4 from "./components/MiniTimeline4";
 import { current } from "@reduxjs/toolkit";
 
 function App() {
@@ -76,14 +73,15 @@ function App() {
     initialTimelineTicks.push(i * initialTickInterval);
   }
 
-  console.log(
-    timelineTicks[0],
-    timelineTicks[numberOfTicks],
-    timelineTicks,
-    "🍜"
-  );
+  // console.log(
+  //   timelineTicks[0],
+  //   timelineTicks[numberOfTicks],
+  //   timelineTicks,
+  //   "🍜"
+  // );
 
   const calculateZoomTimelineTicks = (method, offset) => {
+    console.log("🥨");
     let tickIntervalTest;
     // let offset;
     switch (method) {
@@ -100,30 +98,9 @@ function App() {
         break;
     }
 
-    // switch (method) {
-    //   case "zoomin":
-    //   case "zoomout":
-    //     offset = -4;
-    //     break;
-    //   case "recalculate":
-    //     offset = -1;
-    //     break;
-    // }
-
-    // console.log(tickIntervalTest, "🌭");
-
-    // const tickIntervalTest =
-    //   videoState.duration / ((zoom + zoomIncrement) * numberOfTicks);
-
     const zoomTimelineTicksTest = [];
     const initialTime = videoState.playedSec - 4 * tickIntervalTest;
     const finalTime = videoState.playedSec + 5 * tickIntervalTest;
-    // console.log(
-    //   "recalculating timeline ticks 🧃",
-    //   videoState.playedSec,
-    //   initialTime,
-    //   finalTime
-    // );
 
     if (initialTime < 0) {
       console.log("calculate zoom IN set initial as 0");
@@ -163,31 +140,20 @@ function App() {
     }
   };
 
-  if (zoom > 1 && videoState.playedSec > timelineTicks[numberOfTicks] - 1) {
+  if (zoom > 1 && videoState.playedSec > timelineTicks[numberOfTicks] - 0.1) {
     calculateZoomTimelineTicks("recalculate", 7);
   }
 
   if (
     zoom > 1 &&
     videoState.playedSec > 0 &&
-    videoState.playedSec < timelineTicks[0] + 1
+    videoState.playedSec < timelineTicks[0] + 0.1
   ) {
     console.log("recalculating to prev 🥟");
     calculateZoomTimelineTicks("recalculate", 2);
   }
 
   const timelineValueRange = [timelineTicks[0], timelineTicks[numberOfTicks]];
-
-  // console.log(miniTimelineTicks, timelineTicks, timelineValueRange, "🅱");
-  // console.log(
-  //   initialTickInterval,
-  //   windowTime,
-  //   tickInterval,
-  //   initialTimelineTicks,
-  //   zoomTimelineTicks,
-  //   timelineTicks,
-  //   "🍣"
-  // );
 
   // Handlers
   const zoomOutHandler = () => {
@@ -326,15 +292,7 @@ function App() {
   };
   //
 
-  /////////////////////////
-  // minitimeline 3
 
-  // move state stuff to this app parent component to prevent rerender cycle?
-  // const [isHoveringHandle, setIsHoveringHandle] = useState(false);
-  // const [miniTimelineXPos, setMiniTimelineXPos] = useState(0);
-  // const [mousePosX, setMousePosX] = useState(0);
-
-  /////////////////////////
 
   return (
     <div className={classes["app-container"]}>
@@ -351,15 +309,6 @@ function App() {
             // controls={true}
             progressInterval={500}
           />
-          {/* <MiniTimeline
-            playedFrac={videoState.playedFrac}
-            width={playerWidth}
-            seeking={videoState.seeking}
-            setSeekingTrue={handleSeekingTrue}
-            setSeekingFalse={handleSeekingFalse}
-            handleSeek={handleSeek}
-            updatePlayedFrac={updatePlayedFrac}
-          /> */}
           <MiniTimeline2
             playedFrac={videoState.playedFrac}
             onSliderChange={updatePlayedFrac}
@@ -370,30 +319,6 @@ function App() {
             timelineValueRange={timelineValueRange}
             zoomLevel={zoom}
           />
-          {/* <MiniTimeline3
-            width={playerWidth}
-            playedFrac={videoState.playedFrac}
-            updatePlayedFrac={updatePlayedFrac}
-            isHoveringHandle={isHoveringHandle}
-            setIsHoveringHandle={setIsHoveringHandle}
-            miniTimelineXPos={miniTimelineXPos}
-            setMiniTimelineXPos={setMiniTimelineXPos}
-            mousePosX={mousePosX}
-            setMousePosX={setMousePosX}
-            handleSeekingTrue={handleSeekingTrue}
-            handleSeekingFalse={handleSeekingFalse}
-            seeking={videoState.seeking}
-          /> */}
-          {/* <MiniTimeline4
-            playedFrac={videoState.playedFrac}
-            onSliderChange={updatePlayedFrac}
-            onMouseDown={handleMouseDown}
-            onMouseUp={handleMouseUp}
-            duration={videoState.duration}
-            miniTimelineTicks={miniTimelineTicks}
-            timelineValueRange={timelineValueRange}
-            zoomLevel={zoom}
-          /> */}
           <PlayerControls
             onPlayPauseClick={playPauseHandler}
             playing={videoState.playing}
@@ -406,6 +331,7 @@ function App() {
           deselect={escFunction}
           currentlySelectedSegment={currentlySelectedSegment}
           duration={videoState.duration}
+          playedSec={videoState.playedSec}
           seekTo={handleSeek}
           play={playHandler}
           pause={pauseHandler}
@@ -423,6 +349,7 @@ function App() {
           resetZoom={resetZoomHandler}
           duration={videoState.duration}
           playedFrac={videoState.playedFrac}
+          playedSec={videoState.playedSec}
           timelineValueRange={timelineValueRange}
           onSliderChange={updatePlayedFrac}
           onMouseDown={handleMouseDown}
@@ -430,6 +357,7 @@ function App() {
           seekTo={handleSeek}
           currentlySelectedSegment={currentlySelectedSegment}
           setCurrentlySelectedSegment={setCurrentlySelectedSegment}
+          escFunction={escFunction}
         />
       </div>
     </div>

@@ -1,120 +1,100 @@
-import { useState, useEffect, useRef } from "react";
+import Slider, { Handle } from "rc-slider";
+import "rc-slider/assets/index.css";
+import Timetick from "../media/Timetick";
+
+import { secondsToMinAndSec } from "../helpers/SecondsTimeFormat";
+
 import classes from "../styles/MiniTimeline.module.css";
 
 const MiniTimeline = (props) => {
-  // REMAKE WITH INPUT slider COMPONENT
+  const miniTimelineValues = props.miniTimelineTicks.map((timeTick) => {
+    return (
+      <div className={classes["tick"]} key={timeTick}>
+        <div
+          style={{ height: "8px", width: "2px", backgroundColor: "black" }}
+        ></div>
+        <p style={{ position: "absolute", zIndex: "999" }}>
+          {secondsToMinAndSec(timeTick)}
+        </p>
+      </div>
+    );
+  });
 
-  const miniTimelineRef = useRef();
-  // const seeking = props.seeking;
-  const timelineWidth = props.width;
-  const [seeking, setSeeking] = useState(false);
-
-  const [miniTimelineX, setMiniTimelineX] = useState(0);
-  const [mousePosX, setMousePosX] = useState(0);
-
-  const playedFrac = props.playedFrac;
-  const timelineFrac = (mousePosX - miniTimelineX) / timelineWidth;
-
-  const leftFromMiniTimeline = mousePosX - miniTimelineX;
-
-  const leftPxTest = seeking
-    ? leftFromMiniTimeline
-    : playedFrac * timelineWidth;
-
-  // position of mini-timeline (x)
-  const calculatePosition = () => {
-    const x = miniTimelineRef.current.offsetLeft;
-    console.log(x, "🤗🙂");
-    setMiniTimelineX(x);
+  const sliderChangeHandler = (e) => {
+    props.onSliderChange(parseFloat(e));
   };
-  useEffect(() => {
-    calculatePosition();
-  }, []);
-  useEffect(() => {
-    window.addEventListener("resize", calculatePosition);
-  }, []);
-  //
 
   const mouseDownHandler = () => {
-    // props.setSeekingTrue();
-    setSeeking(true);
-    console.log("clicked down!");
+    props.onMouseDown();
   };
 
-  // const mouseUpHandler = () => {
-  //   console.log("let go of click");
-  //   props.handleSeek(timelineFrac);
-  //   // props.setSeekingFalse();
-  //   setSeeking(false);
-  // };
-
-  // const handleMouseMove = (e) => {
-  //   setMousePosX(e.clientX);
-  //   if (seeking) {
-  //     props.handleSeek(timelineFrac);
-  //   }
-  // };
-
-  const handleTimelineClick = () => {
-    props.handleSeek(timelineFrac);
+  const mouseUpHandler = (e) => {
+    props.onMouseUp(parseFloat(e));
   };
-
-  useEffect(() => {
-    const handleMouseMove = (event) => {
-      setMousePosX(event.clientX);
-      if (seeking) {
-        // props.handleSeek(timelineFrac);
-        props.updatePlayedFrac(timelineFrac);
-        console.log("updating played frac 🐱");
-      }
-      // props.updatePlayedFrac(timelineFrac);
-      // console.log("updating played frac 🐱");
-    };
-
-    window.addEventListener("mousemove", handleMouseMove);
-
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-    };
-  }, []);
-
-  useEffect(() => {
-    const handleMouseUp = () => {
-      console.log("let go of click");
-      console.log(timelineFrac, "😡");
-      props.handleSeek(timelineFrac);
-      // props.setSeekingFalse();
-      setSeeking(false);
-    };
-
-    window.addEventListener("mouseup", handleMouseUp);
-
-    return () => {
-      window.removeEventListener("mouseup", handleMouseUp);
-    };
-  }, []);
 
   return (
-    <div
-      className={classes["container"]}
-      // onMouseUp={mouseUpHandler}
-      // onMouseMove={handleMouseMove}
-    >
-      <div
-        className={classes["mini-timeline"]}
-        ref={miniTimelineRef}
-        // onMouseMove={handleMouseMove}
-        onClick={handleTimelineClick}
-        // onMouseOut={handleMouseOut}
-      >
+    <div style={{ marginTop: "8px" }}>
+      <Slider
+        min={0}
+        max={0.999}
+        step={0.001}
+        value={props.playedFrac}
+        onMouseDown={mouseDownHandler}
+        onMouseUp={mouseUpHandler}
+        onChange={sliderChangeHandler}
+        trackStyle={{ display: "none" }}
+        railStyle={{ display: "none" }}
+        handleStyle={{
+          border: "none",
+          backgroundColor: "none",
+          boxShadow: "none",
+          zIndex: 999,
+          // paddingLeft: "2px",
+        }}
+        handle={(handleProps) => {
+          return (
+            <Handle {...handleProps}>
+              <Timetick />
+            </Handle>
+          );
+        }}
+      />
+      <div className={classes["mini-timeline"]}>
+        <div className={classes["tick-container"]}>{miniTimelineValues}</div>
+        {/* <div
+          className={classes["zone-indicator"]}
+          // maybe try to have these as variable first, to make sure that values are there before putting into code? problem is that video duration data takes a little time before it loads
+          style={{
+            left: `${(props.timelineValueRange[0] / props.duration) * 614.4}px`,
+            width: `${
+              ((props.timelineValueRange[1] - props.timelineValueRange[0]) /
+                props.duration) *
+              614.4
+            }px`,
+            opacity: `${props.zoomLevel === 1 ? 0 : 1}`,
+          }}
+        ></div> */}
         <div
-          className={classes["time-dot"]}
-          style={{ left: `${leftPxTest}px` }}
-          onMouseDown={mouseDownHandler}
+          className={classes["left-bracket"]}
+          style={{
+            left: `${(props.timelineValueRange[0] / props.duration) * 614.4}px`,
+            opacity: `${props.zoomLevel === 1 ? 0 : 1}`,
+          }}
+        ></div>
+        <div
+          className={classes["right-bracket"]}
+          style={{
+            left: `${
+              (props.timelineValueRange[0] / props.duration) * 614.4 +
+              ((props.timelineValueRange[1] - props.timelineValueRange[0]) /
+                props.duration) *
+                614.4 -
+              12
+            }px`,
+            opacity: `${props.zoomLevel === 1 ? 0 : 1}`,
+          }}
         ></div>
       </div>
-      <div>mouse pos x: {mousePosX}</div>
-      <div>left from minitimeline: {leftFromMiniTimeline}</div>
     </div>
   );
 };
