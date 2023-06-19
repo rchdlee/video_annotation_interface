@@ -198,7 +198,9 @@ const SelectedAnnotation = (props) => {
           className={classes["edit-input"]}
         />
       ) : (
-        <p style={{ marginLeft: "16px" }}>
+        <p
+        // style={{ marginLeft: "16px" }}
+        >
           {selectedAnnotation?.comments
             ? selectedAnnotation?.comments
             : "[empty]"}
@@ -256,12 +258,7 @@ const SelectedAnnotation = (props) => {
             <button
               onClick={editSegmentStartHandler}
               disabled={isPlayingSegment}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "8px",
-              }}
+              className={classes["multi-button"]}
               title="Set New Start Time"
             >
               {/* Set New Start */}
@@ -271,12 +268,7 @@ const SelectedAnnotation = (props) => {
             <button
               onClick={editSegmentEndHandler}
               disabled={isPlayingSegment}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "8px",
-              }}
+              className={classes["multi-button"]}
               title="Set New End Time"
             >
               {/* Set New End */}

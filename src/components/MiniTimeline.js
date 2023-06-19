@@ -65,11 +65,11 @@ const MiniTimeline = (props) => {
           className={classes["zone-indicator"]}
           // maybe try to have these as variable first, to make sure that values are there before putting into code? problem is that video duration data takes a little time before it loads
           style={{
-            left: `${(props.timelineValueRange[0] / props.duration) * 614.4}px`,
+            left: `${(props.timelineValueRange[0] / props.duration) * props.playerWidth}px`,
             width: `${
               ((props.timelineValueRange[1] - props.timelineValueRange[0]) /
                 props.duration) *
-              614.4
+              props.playerWidth
             }px`,
             opacity: `${props.zoomLevel === 1 ? 0 : 1}`,
           }}
@@ -77,7 +77,9 @@ const MiniTimeline = (props) => {
         <div
           className={classes["left-bracket"]}
           style={{
-            left: `${(props.timelineValueRange[0] / props.duration) * 614.4}px`,
+            left: `${
+              (props.timelineValueRange[0] / props.duration) * props.playerWidth
+            }px`,
             opacity: `${props.zoomLevel === 1 ? 0 : 1}`,
           }}
         ></div>
@@ -85,10 +87,11 @@ const MiniTimeline = (props) => {
           className={classes["right-bracket"]}
           style={{
             left: `${
-              (props.timelineValueRange[0] / props.duration) * 614.4 +
+              (props.timelineValueRange[0] / props.duration) *
+                props.playerWidth +
               ((props.timelineValueRange[1] - props.timelineValueRange[0]) /
                 props.duration) *
-                614.4 -
+                props.playerWidth -
               12
             }px`,
             opacity: `${props.zoomLevel === 1 ? 0 : 1}`,

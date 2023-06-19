@@ -1,117 +1,254 @@
-.container {
-  width: 20vw;
-  /* margin-left: 24px; */
-  border: 2px solid black;
-  border-radius: 8px;
+@media (min-width: 992px) {
+  .container {
+    width: 225px;
+    /* margin-left: 24px; */
+    border: 2px solid black;
+    border-radius: 8px;
+    font-size: 14px;
+  }
+
+  .inner-container {
+    margin: 12px 18px;
+  }
+
+  .deselect {
+    text-align: right;
+    padding-top: 8px;
+  }
+
+  .deselect:hover {
+    text-decoration: underline;
+  }
+
+  .annotation-information {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 12px;
+    margin-top: 8px;
+  }
+
+  .annotation-descriptor {
+    display: flex;
+    gap: 8px;
+  }
+
+  .annotation-descriptor p {
+    margin: 0;
+  }
+
+  .radio-form {
+    margin-bottom: 8px;
+  }
+
+  .radio-form p {
+    margin-top: 8px;
+    margin-bottom: 4px;
+  }
+
+  .radio-form form {
+    margin-left: 12px;
+  }
+
+  /* .radio-btn {
+    margin-bottom: 4px;
+  } */
+
+  /* .comment-label-container {
+    margin-bottom: 4px;
+  } */
+
+  .comments {
+    height: auto;
+    /* height: 56px; */
+    border-bottom: 1px solid black;
+  }
+
+  .comments div {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .comments button {
+    height: 20px;
+  }
+
+  .comments input {
+    height: 20px;
+  }
+
+  .comments p {
+    margin: 8px 16px;
+  }
+
+  .edit-input {
+    margin-bottom: 8px;
+    /* margin-left: 16px; */
+  }
+
+  .button-container {
+    margin-top: 12px;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .button-container button {
+    height: 36px;
+    width: 36px;
+    padding: 8px 4px;
+    background-color: white;
+    border-radius: 4px;
+    border: 1px solid black;
+  }
+
+  .button-container button img {
+    height: 16px;
+  }
+
+  .button-container button:hover {
+    background-color: rgb(217, 232, 246);
+  }
+
+  .button-container button:disabled:hover {
+    background-color: white;
+  }
+
+  .button-container button:active {
+    background-color: rgb(184, 213, 240);
+  }
+
+  .button-container button:disabled {
+    opacity: 0.5;
+  }
+
+  .multi-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+  }
 }
 
-.inner-container {
-  margin: 12px 32px;
-}
+@media (min-width: 1200px) {
+  .container {
+    width: 300px;
+    /* margin-left: 24px; */
+  }
 
-.deselect {
-  text-align: right;
-  padding-top: 8px;
-}
+  .inner-container {
+    margin: 12px 32px;
+  }
 
-.deselect:hover {
-  text-decoration: underline;
-}
+  .deselect {
+    text-align: right;
+    padding-top: 8px;
+  }
 
-.annotation-information {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 18px;
-  margin-top: 12px;
-}
+  .deselect:hover {
+    text-decoration: underline;
+  }
 
-.annotation-descriptor {
-  display: flex;
-  gap: 8px;
-}
+  .annotation-information {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 18px;
+    margin-top: 12px;
+  }
 
-.annotation-descriptor p {
-  margin: 0;
-}
+  .annotation-descriptor {
+    display: flex;
+    gap: 8px;
+  }
 
-.radio-form {
-  margin-bottom: 12px;
-}
+  .annotation-descriptor p {
+    margin: 0;
+  }
 
-.radio-form p {
-  margin-top: 12px;
-  margin-bottom: 12px;
-}
+  .radio-form {
+    margin-bottom: 12px;
+  }
 
-.radio-form form {
-  margin-left: 12px;
-}
+  .radio-form p {
+    margin-top: 12px;
+    margin-bottom: 12px;
+  }
 
-.radio-btn {
-  margin-bottom: 4px;
-}
+  .radio-form form {
+    margin-left: 12px;
+  }
 
-.comment-label-container {
-  margin-bottom: 8px;
-}
+  .radio-btn {
+    margin-bottom: 4px;
+  }
 
-.comments {
-  /* height: 72px; */
-  height: 64px;
-  border-bottom: 1px solid black;
-}
+  .comment-label-container {
+    margin-bottom: 8px;
+  }
 
-.comments div {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
+  .comments {
+    /* height: 72px; */
+    height: auto;
+    border-bottom: 1px solid black;
+  }
 
-.comments button {
-  height: 20px;
-}
+  .comments div {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
 
-.comments input {
-  height: 20px;
-}
+  .comments button {
+    height: 20px;
+  }
 
-.comments p {
-  margin-bottom: 8px;
-}
+  .comments input {
+    height: 20px;
+  }
 
-.edit-input {
-  margin-bottom: 8px;
-  /* margin-left: 16px; */
-}
+  .comments p {
+    margin-bottom: 8px;
+  }
 
-.button-container {
-  margin-top: 12px;
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-}
+  .edit-input {
+    margin-bottom: 8px;
+    /* margin-left: 16px; */
+  }
 
-.button-container button {
-  height: 48px;
-  width: 48px;
-  background-color: white;
-  border-radius: 4px;
-  border: 1px solid black;
-}
+  .button-container {
+    margin-top: 12px;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+  }
 
-.button-container button:hover {
-  background-color: rgb(217, 232, 246);
-}
+  .button-container button {
+    height: 48px;
+    width: 48px;
+    background-color: white;
+    border-radius: 4px;
+    border: 1px solid black;
+  }
 
-.button-container button:disabled:hover {
-  background-color: white;
-}
+  .button-container button:hover {
+    background-color: rgb(217, 232, 246);
+  }
 
-.button-container button:active {
-  background-color: rgb(184, 213, 240);
-}
+  .button-container button:disabled:hover {
+    background-color: white;
+  }
 
-.button-container button:disabled {
-  opacity: 0.5;
+  .button-container button:active {
+    background-color: rgb(184, 213, 240);
+  }
+
+  .button-container button:disabled {
+    opacity: 0.5;
+  }
+
+  .multi-button {
+    gap: 8px;
+  }
 }

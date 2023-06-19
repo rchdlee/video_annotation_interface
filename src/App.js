@@ -6,20 +6,40 @@ import classes from "./App.module.css";
 
 import SelectedAnnotation from "./components/SelectedAnnotation";
 import PlayerControls from "./components/PlayerControls";
-import MiniTimeline2 from "./components/MiniTimeline";
+import MiniTimeline from "./components/MiniTimeline";
 
 import clip from "./media/lexclip.mp4";
 import inputData from "./media/input.json";
 import { annotationActions } from "./store/annotation-slice";
 import Annotations from "./components/Annotations";
-import { current } from "@reduxjs/toolkit";
+// import { current } from "@reduxjs/toolkit";
 
 function App() {
   const playerRef = useRef(null);
   const dispatch = useDispatch();
 
-  const screenWidth = window.innerWidth;
-  const playerWidth = 0.4 * screenWidth;
+  // const screenWidth = window.innerWidth;
+
+  const [screenWidthTest, setScreenWidthTest] = useState();
+
+  const calculatePosition = () => {
+    const x = window.innerWidth;
+    setScreenWidthTest(x);
+  };
+  useEffect(() => {
+    calculatePosition();
+  }, []);
+  useEffect(() => {
+    window.addEventListener("resize", calculatePosition);
+  }, []);
+
+  let playerWidth;
+  if (screenWidthTest >= 992 && screenWidthTest < 1200) {
+    playerWidth = 525;
+  }
+  if (screenWidthTest >= 1200) {
+    playerWidth = 625;
+  }
 
   // video data from input.json
 
@@ -32,7 +52,7 @@ function App() {
     //   return channel.name;
     // });
     // console.log(inputData, categories);
-  }, []);
+  }, [dispatch]);
   //
 
   // video state
@@ -51,7 +71,7 @@ function App() {
   const numberOfTicks = 9;
   const windowTime = videoState.duration / zoom;
   const initialTickInterval = videoState.duration / numberOfTicks;
-  const tickInterval = windowTime / numberOfTicks;
+  // const tickInterval = windowTime / numberOfTicks;
 
   //  DELETED WINDOWNUMBER
   const windowNumber = Math.trunc(videoState.playedSec / windowTime) + 1;
@@ -81,7 +101,7 @@ function App() {
   // );
 
   const calculateZoomTimelineTicks = (method, offset) => {
-    console.log("🥨");
+    console.log("ran calculateZoomTimelineTicks 🥨");
     let tickIntervalTest;
     // let offset;
     switch (method) {
@@ -140,16 +160,22 @@ function App() {
     }
   };
 
-  if (zoom > 1 && videoState.playedSec > timelineTicks[numberOfTicks] - 0.1) {
+  if (
+    zoom > 1 &&
+    videoState.playedSec > timelineTicks[numberOfTicks] - 0.1 &&
+    zoomTimelineTicks[9] !== videoState.duration
+  ) {
+    console.log("🍿", zoomTimelineTicks, videoState.duration);
     calculateZoomTimelineTicks("recalculate", 7);
   }
 
   if (
     zoom > 1 &&
     videoState.playedSec > 0 &&
-    videoState.playedSec < timelineTicks[0] + 0.1
+    videoState.playedSec < timelineTicks[0] + 0.1 &&
+    timelineTicks[0] !== 0
   ) {
-    console.log("recalculating to prev 🥟");
+    // console.log("recalculating to prev 🥟");
     calculateZoomTimelineTicks("recalculate", 2);
   }
 
@@ -185,11 +211,17 @@ function App() {
     dispatch(annotationActions.setCurrentlySelectedSegment(null));
   };
 
-  const escFunctionWithKey = useCallback((e) => {
+  // const escFunctionWithKey = useCallback((e) => {
+  //   if (e.key === "Escape") {
+  //     escFunction();
+  //   }
+  // });
+
+  const escFunctionWithKey = (e) => {
     if (e.key === "Escape") {
       escFunction();
     }
-  });
+  };
 
   useEffect(() => {
     document.addEventListener("keydown", escFunctionWithKey, false);
@@ -292,74 +324,82 @@ function App() {
   };
   //
 
-
-
   return (
     <div className={classes["app-container"]}>
-      <div className={classes["upper-container"]}>
-        <div className={classes["video-container"]}>
-          <ReactPlayer
-            ref={playerRef}
-            url={clip}
-            width={playerWidth}
-            height={(playerWidth * 720) / 1280}
-            playing={videoState.playing}
-            onProgress={handleProgress}
-            onReady={setVideoDuration}
-            // controls={true}
-            progressInterval={500}
-          />
-          <MiniTimeline2
-            playedFrac={videoState.playedFrac}
-            onSliderChange={updatePlayedFrac}
-            onMouseDown={handleMouseDown}
-            onMouseUp={handleMouseUp}
-            duration={videoState.duration}
-            miniTimelineTicks={miniTimelineTicks}
-            timelineValueRange={timelineValueRange}
-            zoomLevel={zoom}
-          />
-          <PlayerControls
-            onPlayPauseClick={playPauseHandler}
-            playing={videoState.playing}
-            duration={videoState.duration}
-            playedSec={videoState.playedSec}
-            playedFrac={videoState.playedFrac}
-          />
+      {screenWidthTest < 992 ? (
+        <div className={classes["full-screen-modal-temp"]}>
+          Please use desktop full screen to use the video annotation tool
         </div>
-        <SelectedAnnotation
-          deselect={escFunction}
-          currentlySelectedSegment={currentlySelectedSegment}
-          duration={videoState.duration}
-          playedSec={videoState.playedSec}
-          seekTo={handleSeek}
-          play={playHandler}
-          pause={pauseHandler}
-        />
-      </div>
-      <div className={classes["bottom-container"]}>
-        <Annotations
-          timelineTicks={timelineTicks}
-          numberOfTicks={numberOfTicks}
-          windowNumber={windowNumber}
-          windowTime={windowTime}
-          zoomLevel={zoom}
-          zoomIn={zoomInHandler}
-          zoomOut={zoomOutHandler}
-          resetZoom={resetZoomHandler}
-          duration={videoState.duration}
-          playedFrac={videoState.playedFrac}
-          playedSec={videoState.playedSec}
-          timelineValueRange={timelineValueRange}
-          onSliderChange={updatePlayedFrac}
-          onMouseDown={handleMouseDown}
-          onMouseUp={handleMouseUp}
-          seekTo={handleSeek}
-          currentlySelectedSegment={currentlySelectedSegment}
-          setCurrentlySelectedSegment={setCurrentlySelectedSegment}
-          escFunction={escFunction}
-        />
-      </div>
+      ) : (
+        <div>
+          <div className={classes["upper-container"]}>
+            <div className={classes["video-container"]}>
+              <ReactPlayer
+                ref={playerRef}
+                url={clip}
+                width={playerWidth}
+                height={(playerWidth * 720) / 1280}
+                playing={videoState.playing}
+                onProgress={handleProgress}
+                onReady={setVideoDuration}
+                // controls={true}
+                progressInterval={500}
+              />
+              <MiniTimeline
+                playedFrac={videoState.playedFrac}
+                onSliderChange={updatePlayedFrac}
+                onMouseDown={handleMouseDown}
+                onMouseUp={handleMouseUp}
+                duration={videoState.duration}
+                miniTimelineTicks={miniTimelineTicks}
+                timelineValueRange={timelineValueRange}
+                zoomLevel={zoom}
+                playerWidth={playerWidth}
+              />
+              <PlayerControls
+                onPlayPauseClick={playPauseHandler}
+                playing={videoState.playing}
+                duration={videoState.duration}
+                playedSec={videoState.playedSec}
+                playedFrac={videoState.playedFrac}
+              />
+            </div>
+            <SelectedAnnotation
+              deselect={escFunction}
+              currentlySelectedSegment={currentlySelectedSegment}
+              duration={videoState.duration}
+              playedSec={videoState.playedSec}
+              seekTo={handleSeek}
+              play={playHandler}
+              pause={pauseHandler}
+            />
+          </div>
+          <div className={classes["bottom-container"]}>
+            <Annotations
+              timelineTicks={timelineTicks}
+              numberOfTicks={numberOfTicks}
+              windowNumber={windowNumber}
+              windowTime={windowTime}
+              zoomLevel={zoom}
+              zoomIn={zoomInHandler}
+              zoomOut={zoomOutHandler}
+              resetZoom={resetZoomHandler}
+              duration={videoState.duration}
+              playedFrac={videoState.playedFrac}
+              playedSec={videoState.playedSec}
+              timelineValueRange={timelineValueRange}
+              onSliderChange={updatePlayedFrac}
+              onMouseDown={handleMouseDown}
+              onMouseUp={handleMouseUp}
+              seekTo={handleSeek}
+              currentlySelectedSegment={currentlySelectedSegment}
+              setCurrentlySelectedSegment={setCurrentlySelectedSegment}
+              escFunction={escFunction}
+              screenWidth={screenWidthTest}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

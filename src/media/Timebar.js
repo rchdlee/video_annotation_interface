@@ -1,9 +1,22 @@
-const Timebar = () => {
+const Timebar = (props) => {
+  // regular height (big screen): 305
+  let height = 255;
+
+  if (props.screenWidth >= 992 && props.screenWidth < 1200) {
+    height = 255;
+  }
+  if (props.screenWidth >= 1200) {
+    height = 305;
+    // height = 255;
+  }
+
+  const viewBox = `0 0 12 ${height}`;
+
   return (
     <svg
       width="12"
-      height="310"
-      viewBox="0 0 12 310"
+      height={height}
+      viewBox={viewBox}
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >

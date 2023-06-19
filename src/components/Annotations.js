@@ -33,7 +33,16 @@ const Annotations = (props) => {
   const dispatch = useDispatch();
   const inputData = useSelector((state) => state.annotation.inputData);
   const annotations = useSelector((state) => state.annotation.annotations);
-  const trackWidth = 800;
+  let trackWidth;
+  let annotationContainerHeight;
+  if (props.screenWidth >= 992 && props.screenWidth < 1200) {
+    trackWidth = 650;
+    annotationContainerHeight = 200;
+  }
+  if (props.screenWidth >= 1200) {
+    trackWidth = 800;
+    annotationContainerHeight = 250;
+  }
 
   const timelineValues = props.timelineTicks.map((timeTick) => {
     // only have timeline values if props.timelineTicks array is filled with actual values
@@ -64,36 +73,6 @@ const Annotations = (props) => {
       category,
       startTime
     );
-
-    // OVERLAP CHECK
-    // const sameCategoryData = annotations.filter(
-    //   (segment) => segment.categoryName === category
-    // );
-
-    // const startSegmentOverlapData = sameCategoryData.map((segment) => {
-    //   return {
-    //     segmentID: segment.segmentID,
-    //     greaterThanStart: startTime > segment.timeStartSec,
-    //     lessThanEnd: startTime < segment.timeEndSec,
-    //   };
-    // });
-
-    // const startOverlapSegments = startSegmentOverlapData.filter(
-    //   (segment) =>
-    //     segment.greaterThanStart === true && segment.lessThanEnd === true
-    // );
-
-    // if (startOverlapSegments.length > 0) {
-    //   console.log("start segment is inside another segment ❌");
-    //   return;
-    // } else {
-    //   setInitialAnnotationData((prevState) => ({
-    //     ...prevState,
-    //     category: category,
-    //     startTimeSec: startTime.toFixed(2),
-    //   }));
-    //   setIsSelectingFinishTime(true);
-    // }
 
     if (!isValidated) {
       // ERROR ALERT MODAL
@@ -134,8 +113,10 @@ const Annotations = (props) => {
     console.log(annotationChannelInfo[0], channelHasRadio, "🧇");
     //
 
+    const id = uuidv4().slice(0, 8);
     const data = {
-      segmentID: uuidv4(),
+      // segmentID: uuidv4(),
+      segmentID: id,
       timeStartSec: +initialAnnotationData.startTimeSec,
       timeEndSec: +finishTime.toFixed(2),
       categoryName: initialAnnotationData.category,
@@ -149,66 +130,6 @@ const Annotations = (props) => {
       data.timeEndSec,
       "end"
     );
-
-    console.log(data, "😡");
-
-    // OVERLAP CHECK
-    // const sameCategoryData = annotations.filter(
-    //   (annotation) => annotation.categoryName === data.categoryName
-    // );
-
-    // const segmentEndOverlapData = sameCategoryData.map((segment) => {
-    //   return {
-    //     segmentID: segment.segmentID,
-    //     greaterThanStart: data.timeEndSec > segment.timeStartSec,
-    //     lessThanEnd: data.timeEndSec < segment.timeEndSec,
-    //     containsAnotherSegment:
-    //       data.timeStartSec < segment.timeStartSec &&
-    //       data.timeEndSec > segment.timeEndSec,
-    //   };
-    // });
-
-    // const endOverlapSegments = segmentEndOverlapData.filter(
-    //   (segment) =>
-    //     segment.greaterThanStart === true && segment.lessThanEnd === true
-    // );
-    // const overlappingSegments = segmentEndOverlapData.filter(
-    //   (segment) => segment.containsAnotherSegment === true
-    // );
-
-    // if (endOverlapSegments.length > 0) {
-    //   console.log("segment end overlaps another annotation! 😅");
-    //   setInitialAnnotationData({
-    //     category: null,
-    //     startTimeSec: null,
-    //   });
-    //   return;
-    // }
-
-    // if (overlappingSegments.length > 0) {
-    //   console.log("segment contains an existing annotation! 😅");
-    //   setInitialAnnotationData({
-    //     category: null,
-    //     startTimeSec: null,
-    //   });
-    //   return;
-    // }
-
-    // if (data.timeEndSec <= data.timeStartSec) {
-    //   console.log("segment end must be greater than start time! 😅");
-    //   setInitialAnnotationData({
-    //     category: null,
-    //     startTimeSec: null,
-    //   });
-    //   return;
-    // }
-
-    // console.log("adding new data to redux annotations!!", data);
-    // dispatch(annotationActions.addAnnotation(data));
-    // setInitialAnnotationData({
-    //   category: null,
-    //   startTimeSec: null,
-    // });
 
     if (!isValidated) {
       setInitialAnnotationData({
@@ -261,7 +182,9 @@ const Annotations = (props) => {
         </div>
         <div
           className={classes["annotations"]}
-          style={{ height: `${250 / numberOfCategories}px` }}
+          style={{
+            height: `${annotationContainerHeight / numberOfCategories}px`,
+          }}
         >
           {annotations
             .filter((annotation) => annotation.categoryName === channel.name)
@@ -321,7 +244,9 @@ const Annotations = (props) => {
                   style={{
                     position: "absolute",
                     width: `${width}px`,
-                    height: `${250 / numberOfCategories}px`,
+                    height: `${
+                      annotationContainerHeight / numberOfCategories
+                    }px`,
                     // backgroundColor: "lightblue",
                     backgroundColor: `${
                       needsMoreWork ? "lightcoral" : "lightblue"
@@ -348,7 +273,7 @@ const Annotations = (props) => {
               style={{
                 position: "absolute",
                 width: `2px`,
-                height: `${250 / numberOfCategories}px`,
+                height: `${annotationContainerHeight / numberOfCategories}px`,
                 backgroundColor: "black",
                 left: `${
                   ((initialAnnotationData.startTimeSec -
@@ -422,7 +347,7 @@ const Annotations = (props) => {
           </button>
           {/* <p>zoom: {props.zoomLevel}</p> */}
         </div>
-        <div className={classes["timeline"]}>
+        <div className={classes["timeline-slider"]}>
           <Slider
             min={0}
             max={1}
@@ -442,13 +367,13 @@ const Annotations = (props) => {
             handle={(handleProps) => {
               return (
                 <Handle {...handleProps}>
-                  <Timebar />
+                  <Timebar screenWidth={props.screenWidth} />
                 </Handle>
               );
             }}
           />
 
-          <div style={{ height: "24px", width: "800px" }}>
+          <div className={classes["timeline"]}>
             <div
               style={{ borderBottom: "2px solid black", marginTop: "4px" }}
             ></div>
