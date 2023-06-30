@@ -41,7 +41,7 @@ const Annotations = (props) => {
   }
   if (props.screenWidth >= 1200) {
     trackWidth = 800;
-    annotationContainerHeight = 250;
+    annotationContainerHeight = 230;
   }
 
   const timelineValues = props.timelineTicks.map((timeTick) => {
@@ -384,6 +384,10 @@ const Annotations = (props) => {
         </div>
       </div>
       <div className={classes["annotation-container"]}>{Annotations}</div>
+      <div className={classes["scroll-bar-container"]}>
+        <div className={classes["category-name"]}></div>
+        <div>hi</div>
+      </div>
     </div>
   );
 };

@@ -6,7 +6,7 @@ const Timebar = (props) => {
     height = 255;
   }
   if (props.screenWidth >= 1200) {
-    height = 305;
+    height = 280;
     // height = 255;
   }
 

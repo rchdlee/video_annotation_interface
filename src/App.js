@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import ReactPlayer from "react-player";
 // import "./App.css";
 import classes from "./App.module.css";
@@ -22,6 +22,8 @@ function App() {
 
   const [screenWidthTest, setScreenWidthTest] = useState();
 
+  const inputDataFromRedux = useSelector((state) => state.annotation.inputData);
+
   const calculatePosition = () => {
     const x = window.innerWidth;
     setScreenWidthTest(x);
@@ -38,7 +40,7 @@ function App() {
     playerWidth = 525;
   }
   if (screenWidthTest >= 1200) {
-    playerWidth = 625;
+    playerWidth = 615;
   }
 
   // video data from input.json
@@ -337,6 +339,7 @@ function App() {
               <ReactPlayer
                 ref={playerRef}
                 url={clip}
+                // url={inputDataFromRedux?.path}
                 width={playerWidth}
                 height={(playerWidth * 720) / 1280}
                 playing={videoState.playing}

@@ -47,7 +47,7 @@
 @media (min-width: 1200px) {
   .app-container {
     width: 1000px;
-    margin-top: 42px;
+    /* margin-top: 42px; */
   }
 
   .upper-container {
@@ -58,14 +58,14 @@
   }
 
   .video-container {
-    width: 625px;
+    width: 615px;
   }
 
   .bottom-container {
     /* height: 35vh; */
     /* height: calc(100vh - 500px); */
-    height: 300px;
-    margin-top: 18px;
+    height: 280px;
+    margin-top: 12px;
   }
 
   body {

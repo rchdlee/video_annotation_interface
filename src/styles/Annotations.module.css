@@ -109,6 +109,10 @@
   .annotation:hover {
     border: 3px solid rgb(121, 121, 239);
   }
+
+  .scroll-bar-container {
+    display: flex;
+  }
 }
 
 @media (min-width: 1200px) {
@@ -195,7 +199,7 @@
   .annotation-container {
     /* width: 65vw; */
     width: 1000px;
-    height: 250px;
+    height: 230px;
     /* height: calc(100vh - 450px); */
   }
 
