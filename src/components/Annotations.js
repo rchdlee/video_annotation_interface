@@ -386,7 +386,7 @@ const Annotations = (props) => {
       <div className={classes["annotation-container"]}>{Annotations}</div>
       <div className={classes["scroll-bar-container"]}>
         <div className={classes["category-name"]}></div>
-        <div>hi</div>
+        <div>test change</div>
       </div>
     </div>
   );
