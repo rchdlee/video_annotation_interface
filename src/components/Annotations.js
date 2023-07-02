@@ -5,6 +5,8 @@ import { annotationActions } from "../store/annotation-slice";
 import Slider, { Handle } from "rc-slider";
 import { v4 as uuidv4 } from "uuid";
 
+import Scrollbar from "./Scrollbar";
+
 import classes from "../styles/Annotations.module.css";
 // import Timebar from "../media/timebar.svg";
 import Timebar from "../media/Timebar";
@@ -19,7 +21,19 @@ import {
   validateFinishedAnnotation,
 } from "../helpers/AnnotationValidation";
 
+import Draggable from "react-draggable";
+
 const Annotations = (props) => {
+  //draggable
+  // const [deltaPositionX, setDeltaPositionX] = useState(0);
+
+  // const handleDrag = (e, data) => {
+  //   // setDeltaPositionX((prevState) => prevState + ui.deltaX);
+  //   setDeltaPositionX(data.x);
+  //   console.log(data);
+  // };
+  //
+
   //
   // MOVE TO APP.JS FOR SELECTEDANNO DESELECTING
   // const [currentlySelectedSegment, setCurrentlySelectedSegment] =
@@ -183,7 +197,9 @@ const Annotations = (props) => {
         <div
           className={classes["annotations"]}
           style={{
-            height: `${annotationContainerHeight / numberOfCategories}px`,
+            // - 1.6 to account for box-sizing border box for height
+            height: `${annotationContainerHeight / numberOfCategories - 1.6}px`,
+            boxSizing: "border-box",
           }}
         >
           {annotations
@@ -384,10 +400,36 @@ const Annotations = (props) => {
         </div>
       </div>
       <div className={classes["annotation-container"]}>{Annotations}</div>
-      <div className={classes["scroll-bar-container"]}>
+      <Scrollbar
+        timelineValueRange={props.timelineValueRange}
+        duration={props.duration}
+        trackWidth={trackWidth}
+        setZoomTimelineTicks={props.setZoomTimelineTicks}
+
+      />
+      {/* <div className={classes["scroll-bar-container"]}>
         <div className={classes["category-name"]}></div>
-        <div>test change</div>
-      </div>
+        <div className={classes["scroll-bar-track"]}>
+          <Draggable
+            axis="x"
+            bounds="parent"
+            onDrag={handleDrag}
+            grid={[25, 0]}
+          >
+            <div
+              // className="handle"
+              className={classes["scroll-thumb"]}
+              style={{
+                width: "88px",
+                position: "absolute",
+                left: "281px",
+              }}
+            >
+              <div>drag: {deltaPositionX.toFixed(0)}</div>
+            </div>
+          </Draggable>
+        </div>
+      </div> */}
     </div>
   );
 };

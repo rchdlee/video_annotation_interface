@@ -1,0 +1,29 @@
+@media (min-width: 992px) {
+  .category-name {
+    /* width: calc(65vw - 800px); */
+    width: 150px;
+
+    padding-left: 12px;
+    padding-right: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .scroll-bar-container {
+    display: flex;
+  }
+
+  .scroll-bar-track {
+    background-color: rgb(217, 232, 237);
+    width: 650px;
+    height: 24px;
+    position: relative;
+  }
+
+  .scroll-thumb {
+    background-color: #999;
+    height: 24px;
+  }
+}

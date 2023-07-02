@@ -36,11 +36,14 @@ function App() {
   }, []);
 
   let playerWidth;
+  let playerHeight;
   if (screenWidthTest >= 992 && screenWidthTest < 1200) {
     playerWidth = 525;
+    playerHeight = (playerWidth * 720) / 1280;
   }
   if (screenWidthTest >= 1200) {
     playerWidth = 615;
+    playerHeight = (playerWidth * 720) / 1280;
   }
 
   // video data from input.json
@@ -167,7 +170,7 @@ function App() {
     videoState.playedSec > timelineTicks[numberOfTicks] - 0.1 &&
     zoomTimelineTicks[9] !== videoState.duration
   ) {
-    console.log("🍿", zoomTimelineTicks, videoState.duration);
+    // console.log("🍿", zoomTimelineTicks, videoState.duration);
     calculateZoomTimelineTicks("recalculate", 7);
   }
 
@@ -182,7 +185,7 @@ function App() {
   }
 
   const timelineValueRange = [timelineTicks[0], timelineTicks[numberOfTicks]];
-
+  console.log(timelineValueRange, videoState.duration);
   // Handlers
   const zoomOutHandler = () => {
     if (zoom > 1) {
@@ -341,7 +344,8 @@ function App() {
                 url={clip}
                 // url={inputDataFromRedux?.path}
                 width={playerWidth}
-                height={(playerWidth * 720) / 1280}
+                // height={(playerWidth * 720) / 1280}
+                height={playerHeight}
                 playing={videoState.playing}
                 onProgress={handleProgress}
                 onReady={setVideoDuration}
@@ -399,6 +403,7 @@ function App() {
               setCurrentlySelectedSegment={setCurrentlySelectedSegment}
               escFunction={escFunction}
               screenWidth={screenWidthTest}
+              setZoomTimelineTicks={setZoomTimelineTicks}
             />
           </div>
         </div>
