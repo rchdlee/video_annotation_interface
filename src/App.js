@@ -21,6 +21,7 @@ function App() {
   // const screenWidth = window.innerWidth;
 
   const [screenWidthTest, setScreenWidthTest] = useState();
+  const [isDraggingScrollBar, setIsDraggingScrollBar] = useState(false);
 
   const inputDataFromRedux = useSelector((state) => state.annotation.inputData);
 
@@ -74,12 +75,12 @@ function App() {
   const [zoom, setZoom] = useState(1);
   const zoomIncrement = 1;
   const numberOfTicks = 9;
-  const windowTime = videoState.duration / zoom;
   const initialTickInterval = videoState.duration / numberOfTicks;
   // const tickInterval = windowTime / numberOfTicks;
 
-  //  DELETED WINDOWNUMBER
-  const windowNumber = Math.trunc(videoState.playedSec / windowTime) + 1;
+  //  DELETE WINDOWNUMBER AND WINDOWTIME
+  // const windowNumber = Math.trunc(videoState.playedSec / windowTime) + 1;
+  // const windowTime = videoState.duration / zoom;
 
   const miniTimelineTicks = [];
   const initialTimelineTicks = [];
@@ -135,7 +136,7 @@ function App() {
           i * tickIntervalTest
         );
       }
-      console.log(zoomTimelineTicksTest);
+      // console.log(zoomTimelineTicksTest);
       setZoomTimelineTicks(zoomTimelineTicksTest);
     }
     if (finalTime > videoState.duration) {
@@ -167,25 +168,30 @@ function App() {
 
   if (
     zoom > 1 &&
-    videoState.playedSec > timelineTicks[numberOfTicks] - 0.1 &&
-    zoomTimelineTicks[9] !== videoState.duration
+    // videoState.playedSec > timelineTicks[numberOfTicks] - 0.1 &&
+    videoState.playedSec > timelineTicks[numberOfTicks] + 0.1 &&
+    zoomTimelineTicks[9] !== videoState.duration &&
+    !isDraggingScrollBar
   ) {
     // console.log("🍿", zoomTimelineTicks, videoState.duration);
+    console.log("relcalculating to next 🍿");
     calculateZoomTimelineTicks("recalculate", 7);
   }
 
   if (
     zoom > 1 &&
     videoState.playedSec > 0 &&
-    videoState.playedSec < timelineTicks[0] + 0.1 &&
-    timelineTicks[0] !== 0
+    // videoState.playedSec < timelineTicks[0] + 0.1 &&
+    videoState.playedSec < timelineTicks[0] - 0.1 &&
+    timelineTicks[0] !== 0 &&
+    !isDraggingScrollBar
   ) {
-    // console.log("recalculating to prev 🥟");
+    console.log("recalculating to prev 🥟");
     calculateZoomTimelineTicks("recalculate", 2);
   }
 
   const timelineValueRange = [timelineTicks[0], timelineTicks[numberOfTicks]];
-  console.log(timelineValueRange, videoState.duration);
+  // console.log(timelineValueRange, videoState.duration);
   // Handlers
   const zoomOutHandler = () => {
     if (zoom > 1) {
@@ -259,7 +265,7 @@ function App() {
       ...prevState,
       duration: playerRef.current.getDuration(),
     }));
-    console.log("set video duration 😐😐😐😐😐😐😐");
+    // console.log("set video duration 😐😐😐😐😐😐😐");
   };
   //
 
@@ -385,8 +391,8 @@ function App() {
             <Annotations
               timelineTicks={timelineTicks}
               numberOfTicks={numberOfTicks}
-              windowNumber={windowNumber}
-              windowTime={windowTime}
+              // windowNumber={windowNumber}
+              // windowTime={windowTime}
               zoomLevel={zoom}
               zoomIn={zoomInHandler}
               zoomOut={zoomOutHandler}
@@ -404,6 +410,7 @@ function App() {
               escFunction={escFunction}
               screenWidth={screenWidthTest}
               setZoomTimelineTicks={setZoomTimelineTicks}
+              setIsDraggingScrollBar={setIsDraggingScrollBar}
             />
           </div>
         </div>

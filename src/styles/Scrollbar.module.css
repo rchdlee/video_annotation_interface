@@ -1,14 +1,6 @@
 @media (min-width: 992px) {
-  .category-name {
-    /* width: calc(65vw - 800px); */
+  .empty {
     width: 150px;
-
-    padding-left: 12px;
-    padding-right: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
   }
 
   .scroll-bar-container {
@@ -16,14 +8,25 @@
   }
 
   .scroll-bar-track {
-    background-color: rgb(217, 232, 237);
+    background-color: rgb(235, 235, 235);
     width: 650px;
-    height: 24px;
+    height: 18px;
     position: relative;
+    border: 1px solid black;
   }
 
   .scroll-thumb {
     background-color: #999;
-    height: 24px;
+    height: 16px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .empty {
+    width: 200px;
+  }
+
+  .scroll-bar-track {
+    width: 800px;
   }
 }

@@ -291,13 +291,20 @@ const Annotations = (props) => {
                 width: `2px`,
                 height: `${annotationContainerHeight / numberOfCategories}px`,
                 backgroundColor: "black",
-                left: `${
-                  ((initialAnnotationData.startTimeSec -
-                    (props.windowNumber - 1) * props.windowTime) /
-                    props.duration) *
-                  trackWidth *
-                  props.zoomLevel
-                }px`,
+                left:
+                  // `${
+                  //   ((initialAnnotationData.startTimeSec -
+                  //     (props.windowNumber - 1) * props.windowTime) /
+                  //     props.duration) *
+                  //   trackWidth *
+                  //   props.zoomLevel
+                  // }px`,
+                  `${
+                    ((initialAnnotationData.startTimeSec -
+                      props.timelineValueRange[0]) *
+                      trackWidth) /
+                    (props.timelineValueRange[1] - props.timelineValueRange[0])
+                  }px`,
               }}
             ></div>
           ) : (
@@ -313,6 +320,7 @@ const Annotations = (props) => {
     (props.timelineValueRange[1] - props.timelineValueRange[0]);
 
   const sliderChangeHandler = (e) => {
+    console.log("sliderchangehandler from annotations.js 🎫");
     const playedFrac =
       (e * (props.timelineValueRange[1] - props.timelineValueRange[0]) +
         props.timelineValueRange[0]) /
@@ -405,7 +413,13 @@ const Annotations = (props) => {
         duration={props.duration}
         trackWidth={trackWidth}
         setZoomTimelineTicks={props.setZoomTimelineTicks}
-
+        setIsDraggingScrollBar={props.setIsDraggingScrollBar}
+        playedSec={props.playedSec}
+        seekTo={props.seekTo}
+        zoomLevel={props.zoomLevel}
+        numberOfTicks={props.numberOfTicks}
+        escFunction={props.escFunction}
+        currentlySelectedSegment={props.currentlySelectedSegment}
       />
       {/* <div className={classes["scroll-bar-container"]}>
         <div className={classes["category-name"]}></div>
