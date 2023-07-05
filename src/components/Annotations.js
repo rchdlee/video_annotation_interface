@@ -91,6 +91,9 @@ const Annotations = (props) => {
     if (!isValidated) {
       // ERROR ALERT MODAL
       // console.log("start segment is inside another segment ❌❌");
+      props.throwNewError(
+        "Segment start time cannot exist inside another segment"
+      );
       return;
     }
     // if (isValidated) {
@@ -145,11 +148,13 @@ const Annotations = (props) => {
       "end"
     );
 
-    if (!isValidated) {
+    if (!isValidated[0]) {
       setInitialAnnotationData({
         category: null,
         startTimeSec: null,
       });
+      // console.log(isValidated[1], "🧦");
+      props.throwNewError(isValidated[1]);
       return;
     }
     // if (isValidated) {
@@ -389,7 +394,7 @@ const Annotations = (props) => {
             handleStyle={{
               border: "2px solid white",
               boxShadow: "none",
-              zIndex: 999,
+              zIndex: 3,
               // zIndex: `${props.currentlySelectedSegment ? 1 : 999}`,
             }}
             handle={(handleProps) => {

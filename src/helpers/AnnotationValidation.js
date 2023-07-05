@@ -23,9 +23,9 @@ export const validateAnnotationStart = (annotations, category, startTime) => {
   );
 
   if (startOverlapSegments.length > 0) {
-    console.log(
-      "start segment is inside another segment ❌❌ from annovalidation func"
-    );
+    // console.log(
+    //   "start segment is inside another segment ❌❌ from annovalidation func"
+    // );
     return false;
   } else {
     return true;
@@ -40,7 +40,7 @@ export const validateFinishedAnnotation = (
   whichIsNew,
   selectedID
 ) => {
-  console.log(category, startTime, endTime, "🦪");
+  // console.log(category, startTime, endTime, "🦪");
 
   let newTime;
 
@@ -56,7 +56,7 @@ export const validateFinishedAnnotation = (
     .filter((annotation) => annotation.categoryName === category)
     .filter((annotation) => annotation.segmentID !== selectedID);
 
-  console.log(sameCategoryData);
+  // console.log(sameCategoryData);
 
   const segmentOverlapData = sameCategoryData.map((segment) => {
     return {
@@ -76,17 +76,17 @@ export const validateFinishedAnnotation = (
   );
 
   if (newTimeOverlapSegments.length > 0) {
-    console.log(`segment ${whichIsNew} overlaps another annotation! 😅😅`);
-    return false;
+    // console.log(`segment ${whichIsNew} overlaps another annotation! 😅😅`);
+    return [false, `Annotation ${whichIsNew} overlaps another annotation!`];
   }
   if (envelopingSegments.length > 0) {
-    console.log("segment cannot contain another segment inside! 😅😅");
-    return false;
+    // console.log("segment cannot contain another segment inside! 😅😅");
+    return [false, "Annotation cannot contain another segment inside!"];
   }
   if (endTime <= startTime) {
-    console.log("segment end mut be greater than start time 😅😅");
-    return false;
+    // console.log("segment end mut be greater than start time 😅😅");
+    return [false, "Ending time must be greater than start time!"];
   } else {
-    return true;
+    return [true, ""];
   }
 };

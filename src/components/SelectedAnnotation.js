@@ -101,7 +101,8 @@ const SelectedAnnotation = (props) => {
       selectedAnnotation.segmentID
     );
 
-    if (!isValidated) {
+    if (!isValidated[0]) {
+      props.throwNewError(isValidated[1]);
       return;
     }
 
@@ -120,7 +121,8 @@ const SelectedAnnotation = (props) => {
       selectedAnnotation.segmentID
     );
 
-    if (!isValidated) {
+    if (!isValidated[0]) {
+      props.throwNewError(isValidated[1]);
       return;
     }
     dispatch(annotationActions.editSelectedAnnotationEndTime(newEndTime));

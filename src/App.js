@@ -2,11 +2,12 @@ import { useState, useEffect, useRef, useCallback, Fragment } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ReactPlayer from "react-player";
 // import "./App.css";
-import classes from "./App.module.css";
+import classes from "./styles/App.module.css";
 
 import SelectedAnnotation from "./components/SelectedAnnotation";
 import PlayerControls from "./components/PlayerControls";
 import MiniTimeline from "./components/MiniTimeline";
+import ErrorModal from "./components/ErrorModal";
 
 import clip from "./media/lexclip.mp4";
 import inputData from "./media/input.json";
@@ -16,7 +17,6 @@ import Annotations from "./components/Annotations";
 
 function App() {
   // console.log("app.js rerender 🧶");
-
   const playerRef = useRef(null);
   const dispatch = useDispatch();
 
@@ -24,6 +24,8 @@ function App() {
 
   const [screenWidthTest, setScreenWidthTest] = useState();
   const [isDraggingScrollBar, setIsDraggingScrollBar] = useState(false);
+  const [hasError, setHasError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(null);
 
   const inputDataFromRedux = useSelector((state) => state.annotation.inputData);
 
@@ -271,6 +273,13 @@ function App() {
   };
   //
 
+  // Error modal
+  const throwNewError = (message) => {
+    setHasError(true);
+    setErrorMessage(message);
+  };
+  //
+
   // Controls
   const playPauseHandler = () => {
     setVideoState((prevState) => ({
@@ -346,6 +355,11 @@ function App() {
       ) : (
         // <div>
         <Fragment>
+          <ErrorModal
+            hasError={hasError}
+            setHasError={setHasError}
+            errorMessage={errorMessage}
+          />
           <div className={classes["upper-container"]}>
             <div className={classes["video-container"]}>
               <ReactPlayer
@@ -389,6 +403,7 @@ function App() {
                 seekTo={handleSeek}
                 play={playHandler}
                 pause={pauseHandler}
+                throwNewError={throwNewError}
               />
             ) : (
               ""
@@ -418,6 +433,7 @@ function App() {
               screenWidth={screenWidthTest}
               setZoomTimelineTicks={setZoomTimelineTicks}
               setIsDraggingScrollBar={setIsDraggingScrollBar}
+              throwNewError={throwNewError}
             />
           </div>
           {/* </div> */}

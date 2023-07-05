@@ -13,7 +13,7 @@ const MiniTimeline = (props) => {
         <div
           style={{ height: "8px", width: "2px", backgroundColor: "black" }}
         ></div>
-        <p style={{ position: "absolute", zIndex: "999" }}>
+        <p style={{ position: "absolute", zIndex: "2" }}>
           {secondsToMinAndSec(timeTick)}
         </p>
       </div>
@@ -48,7 +48,7 @@ const MiniTimeline = (props) => {
           border: "none",
           backgroundColor: "none",
           boxShadow: "none",
-          zIndex: 999,
+          zIndex: 3,
           // paddingLeft: "2px",
         }}
         handle={(handleProps) => {
