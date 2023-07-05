@@ -1,3 +1,4 @@
+import React from "react";
 import { useSelector } from "react-redux";
 
 import playIcon from "../media/icons/play-solid.svg";
@@ -15,6 +16,8 @@ import {
 import classes from "../styles/PlayerControls.module.css";
 
 const PlayerControls = (props) => {
+  // console.log("playercontrols.js rerender 🧶");
+
   const fps = useSelector((state) => state.annotation.inputData?.fps);
 
   const videoTimeInfo = `${secondsToMinAndSecDecimal(

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, Fragment } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { annotationActions } from "../store/annotation-slice";
 
@@ -315,12 +315,16 @@ const Annotations = (props) => {
     );
   });
 
+  // const sliderFrac =
+  //   (props.playedSec - props.timelineValueRange[0]) /
+  //   (props.timelineValueRange[1] - props.timelineValueRange[0]);
+
   const sliderFrac =
     (props.playedFrac * props.duration - props.timelineValueRange[0]) /
     (props.timelineValueRange[1] - props.timelineValueRange[0]);
 
   const sliderChangeHandler = (e) => {
-    console.log("sliderchangehandler from annotations.js 🎫");
+    // console.log("sliderchangehandler from annotations.js 🎫");
     const playedFrac =
       (e * (props.timelineValueRange[1] - props.timelineValueRange[0]) +
         props.timelineValueRange[0]) /
@@ -341,7 +345,7 @@ const Annotations = (props) => {
   };
 
   return (
-    <div>
+    <Fragment>
       <div className={classes["timeline-container"]}>
         <div className={classes["top-left-container"]}>
           <button
@@ -444,7 +448,7 @@ const Annotations = (props) => {
           </Draggable>
         </div>
       </div> */}
-    </div>
+    </Fragment>
   );
 };
 

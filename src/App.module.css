@@ -24,7 +24,8 @@
   .upper-container {
     height: 400px;
     display: flex;
-    justify-content: space-between;
+    /* justify-content: space-between; */
+    justify-content: center;
     gap: 3vw;
   }
 
@@ -53,7 +54,7 @@
   .upper-container {
     height: 450px;
     display: flex;
-    justify-content: space-between;
+    /* justify-content: space-between; */
     gap: 3vw;
   }
 

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, Fragment } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ReactPlayer from "react-player";
 // import "./App.css";
@@ -15,6 +15,8 @@ import Annotations from "./components/Annotations";
 // import { current } from "@reduxjs/toolkit";
 
 function App() {
+  // console.log("app.js rerender 🧶");
+
   const playerRef = useRef(null);
   const dispatch = useDispatch();
 
@@ -342,7 +344,8 @@ function App() {
           Please use desktop full screen to use the video annotation tool
         </div>
       ) : (
-        <div>
+        // <div>
+        <Fragment>
           <div className={classes["upper-container"]}>
             <div className={classes["video-container"]}>
               <ReactPlayer
@@ -374,18 +377,22 @@ function App() {
                 playing={videoState.playing}
                 duration={videoState.duration}
                 playedSec={videoState.playedSec}
-                playedFrac={videoState.playedFrac}
+                // playedFrac={videoState.playedFrac}
               />
             </div>
-            <SelectedAnnotation
-              deselect={escFunction}
-              currentlySelectedSegment={currentlySelectedSegment}
-              duration={videoState.duration}
-              playedSec={videoState.playedSec}
-              seekTo={handleSeek}
-              play={playHandler}
-              pause={pauseHandler}
-            />
+            {currentlySelectedSegment ? (
+              <SelectedAnnotation
+                deselect={escFunction}
+                currentlySelectedSegment={currentlySelectedSegment}
+                duration={videoState.duration}
+                playedSec={videoState.playedSec}
+                seekTo={handleSeek}
+                play={playHandler}
+                pause={pauseHandler}
+              />
+            ) : (
+              ""
+            )}
           </div>
           <div className={classes["bottom-container"]}>
             <Annotations
@@ -413,7 +420,8 @@ function App() {
               setIsDraggingScrollBar={setIsDraggingScrollBar}
             />
           </div>
-        </div>
+          {/* </div> */}
+        </Fragment>
       )}
     </div>
   );
