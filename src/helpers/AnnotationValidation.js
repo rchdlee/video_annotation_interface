@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 // const annotations = useSelector((state) => state.annotation.annotations);
 
 export const validateAnnotationStart = (annotations, category, startTime) => {
-  console.log(category, startTime, "🍠");
+  // console.log(category, startTime, "🍠");
 
   const sameCategoryData = annotations.filter(
     (segment) => segment.categoryName === category
@@ -51,7 +51,7 @@ export const validateFinishedAnnotation = (
     newTime = endTime;
   }
 
-  console.log(selectedID, "🦪");
+  // console.log(selectedID, "🦪");
   const sameCategoryData = annotations
     .filter((annotation) => annotation.categoryName === category)
     .filter((annotation) => annotation.segmentID !== selectedID);

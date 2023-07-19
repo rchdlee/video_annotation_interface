@@ -143,8 +143,8 @@ const SelectedAnnotation = (props) => {
     console.log(annotationsNeedMoreWork);
 
     if (annotationsNeedMoreWork.includes(true)) {
-      alert(
-        `${numberOfAnnosThatNeedWork} annotations still need radio button data to be filled`
+      props.throwNewError(
+        `${numberOfAnnosThatNeedWork} annotations (gray) still need radio button data to be filled`
       );
       return;
     }
@@ -294,7 +294,40 @@ const SelectedAnnotation = (props) => {
           </div>
         </div>
       ) : (
-        <button onClick={annotationSubmitHandler}>submit</button>
+        <div className={classes["main-menu-container"]}>
+          <div>
+            <h4 className={classes["title"]}>
+              COMPSY Video Annotation Interface
+            </h4>
+            <ul className={classes["main-menu"]}>
+              <a href="/" target="_blank">
+                <li>User Guide</li>
+              </a>
+              <a href="/" target="_blank">
+                <li>FAQs</li>
+              </a>
+              <a href="/" target="_blank">
+                <li>List of Shortcuts</li>
+              </a>
+              <a href="/" target="_blank">
+                <li>Bug/Suggestion Form</li>
+              </a>
+            </ul>
+          </div>
+          <div>--</div>
+          <div className={classes["main-menu-bottom"]}>
+            <div className={classes["video-path"]}>
+              <p>Video Path:</p>
+              <p>{inputData?.path}</p>
+            </div>
+            <button
+              className={classes["submit-btn"]}
+              onClick={annotationSubmitHandler}
+            >
+              Submit Annotations
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );

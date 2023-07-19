@@ -109,7 +109,8 @@
   }
 
   .annotation:hover {
-    border: 3px solid rgb(121, 121, 239);
+    /* border: 3px solid rgb(121, 121, 239); */
+    border: 3px solid rgb(50, 50, 50)
   }
 
   /* .scroll-bar-container {
@@ -247,7 +248,7 @@
     overflow: hidden;
   }
 
-  .annotation:hover {
+  /* .annotation:hover {
     border: 3px solid rgb(121, 121, 239);
-  }
+  } */
 }

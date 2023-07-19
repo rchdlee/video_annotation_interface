@@ -1,4 +1,4 @@
-import { useState, Fragment } from "react";
+import { useState, useEffect, Fragment } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { annotationActions } from "../store/annotation-slice";
 
@@ -43,6 +43,7 @@ const Annotations = (props) => {
     category: null,
     startTimeSec: null,
   });
+  const [selectedChannelIndex, setSelectedChannelIndex] = useState(0);
 
   const dispatch = useDispatch();
   const inputData = useSelector((state) => state.annotation.inputData);
@@ -80,7 +81,39 @@ const Annotations = (props) => {
     const category = e.target.closest("div").id;
     // const startTime = props.duration * props.playedFrac;
     const startTime = props.playedSec;
-    // console.log(category, startTime, "🧩");
+    console.log(category, startTime, "🧩");
+
+    const isValidated = validateAnnotationStart(
+      annotations,
+      category,
+      startTime
+    );
+
+    if (!isValidated) {
+      // ERROR ALERT MODAL
+      // console.log("start segment is inside another segment ❌❌");
+      props.throwNewError(
+        "Segment start time cannot exist inside another segment"
+      );
+      return;
+    }
+    // if (isValidated) {
+    setInitialAnnotationData((prevState) => ({
+      ...prevState,
+      category: category,
+      startTimeSec: startTime.toFixed(2),
+    }));
+    setIsSelectingFinishTime(true);
+    // }
+  };
+
+  const startSegmentHandlerFromKeydown = (name) => {
+    props.escFunction();
+    const category = name;
+
+    // const startTime = props.duration * props.playedFrac;
+    const startTime = props.playedSec;
+    console.log(category, startTime, "🧩");
 
     const isValidated = validateAnnotationStart(
       annotations,
@@ -127,7 +160,7 @@ const Annotations = (props) => {
           .includes(true)
       : false;
 
-    console.log(annotationChannelInfo[0], channelHasRadio, "🧇");
+    // console.log(annotationChannelInfo[0], channelHasRadio, "🧇");
     //
 
     const id = uuidv4().slice(0, 8);
@@ -169,7 +202,7 @@ const Annotations = (props) => {
 
   const annotationClickHandler = (e) => {
     const id = e.target.closest("div").id;
-    console.log(id);
+    // console.log(id);
     props.setCurrentlySelectedSegment(id);
     dispatch(annotationActions.setCurrentlySelectedSegment(id));
 
@@ -180,12 +213,85 @@ const Annotations = (props) => {
   };
 
   const numberOfCategories = inputData?.channels.length;
+  const colorArray = [
+    { unfinished: "lightgray", finished: "#ed544a" },
+    { unfinished: "lightgray", finished: "#399e52" },
+    { unfinished: "lightgray", finished: "#1f81d1" },
+    { unfinished: "lightgray", finished: "#f09135" },
+    { unfinished: "lightgray", finished: "#a030db" },
+    { unfinished: "lightgray", finished: "#faf339" },
+    // { unfinished: "#fcdbd7", finished: "#ed544a" },
+    // { unfinished: "#cce3cc", finished: "#399e52" },
+    // { unfinished: "#e6effc", finished: "#1f81d1" },
+    // { unfinished: "#fcf6e6", finished: "#f09135" },
+    // { unfinished: "#f4e6fc", finished: "#a030db" },
+    // { unfinished: "#fcfbe3", finished: "#faf339" },
+  ];
 
-  const Annotations = inputData?.channels.map((channel) => {
+  const channelClickHandler = (e) => {
+    const index = +e.target.closest(".annotation-row").id;
+    setSelectedChannelIndex(index);
+  };
+
+  const shortcutFunction = (e) => {
+    console.log(e.code);
+    if (e.code === "KeyD") {
+      if (selectedChannelIndex === 0) {
+        return;
+      }
+      setSelectedChannelIndex((prevState) => prevState - 1);
+    }
+
+    if (e.code === "KeyF") {
+      if (selectedChannelIndex === numberOfCategories - 1) {
+        return;
+      }
+      setSelectedChannelIndex((prevState) => prevState + 1);
+    }
+
+    if (e.code === "Space") {
+      if (!isSelectingFinishTime) {
+        const selectedChannelName =
+          inputData?.channels[selectedChannelIndex].name;
+        startSegmentHandlerFromKeydown(selectedChannelName);
+      }
+      if (isSelectingFinishTime) {
+        finishSegmentHandler();
+      }
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("keydown", shortcutFunction, false);
+
+    return () => {
+      document.removeEventListener("keydown", shortcutFunction, false);
+    };
+  }, [shortcutFunction]);
+
+  const Annotations = inputData?.channels.map((channel, index) => {
     return (
-      <div className={classes["annotation-row"]} key={channel.name}>
+      <div
+        className={`${classes["annotation-row"]} annotation-row`}
+        key={channel.name}
+        id={index}
+        onClick={channelClickHandler}
+        style={{
+          // backgroundColor: "#e1eafc",
+          backgroundColor: `${selectedChannelIndex === index ? "#e1eafc" : ""}`,
+        }}
+      >
         <div className={classes["category-name"]} id={channel.name}>
-          <p>{channel.name}</p>
+          <p
+            style={{
+              fontWeight: `${selectedChannelIndex === index ? "700" : ""}`,
+              // textDecoration: `${
+              //   selectedChannelIndex === index ? "underline" : ""
+              // }`,
+            }}
+          >
+            {channel.name}
+          </p>
           {!isSelectingFinishTime ? (
             <button onClick={startSegmentHandler}>
               <img src={ClipIcon} alt="" />
@@ -270,7 +376,9 @@ const Annotations = (props) => {
                     }px`,
                     // backgroundColor: "lightblue",
                     backgroundColor: `${
-                      needsMoreWork ? "lightcoral" : "lightblue"
+                      needsMoreWork
+                        ? colorArray[index].unfinished
+                        : colorArray[index].finished
                     }`,
                     left: `${offsetLeft}px`,
                     border: `${
@@ -308,7 +416,9 @@ const Annotations = (props) => {
                     ((initialAnnotationData.startTimeSec -
                       props.timelineValueRange[0]) *
                       trackWidth) /
-                    (props.timelineValueRange[1] - props.timelineValueRange[0])
+                      (props.timelineValueRange[1] -
+                        props.timelineValueRange[0]) -
+                    1
                   }px`,
               }}
             ></div>
@@ -395,6 +505,7 @@ const Annotations = (props) => {
               border: "2px solid white",
               boxShadow: "none",
               zIndex: 3,
+              // backgroundColor: "transparent",
               // zIndex: `${props.currentlySelectedSegment ? 1 : 999}`,
             }}
             handle={(handleProps) => {

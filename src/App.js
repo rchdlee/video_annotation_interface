@@ -111,7 +111,7 @@ function App() {
   // );
 
   const calculateZoomTimelineTicks = (method, offset) => {
-    console.log("ran calculateZoomTimelineTicks 🥨");
+    // console.log("ran calculateZoomTimelineTicks 🥨");
     let tickIntervalTest;
     // let offset;
     switch (method) {
@@ -133,7 +133,7 @@ function App() {
     const finalTime = videoState.playedSec + 5 * tickIntervalTest;
 
     if (initialTime < 0) {
-      console.log("calculate zoom IN set initial as 0");
+      // console.log("calculate zoom IN set initial as 0");
       for (let i = 0; i <= numberOfTicks; i++) {
         zoomTimelineTicksTest.push(
           // (i * videoState.duration) / ((zoom + zoomIncrement) * numberOfTicks)
@@ -144,7 +144,7 @@ function App() {
       setZoomTimelineTicks(zoomTimelineTicksTest);
     }
     if (finalTime > videoState.duration) {
-      console.log("calculate zoom IN set max value as video duration");
+      // console.log("calculate zoom IN set max value as video duration");
 
       for (let i = 0; i <= numberOfTicks; i++) {
         zoomTimelineTicksTest.push(
@@ -158,7 +158,7 @@ function App() {
       }
     }
     if (initialTime > 0 && finalTime < videoState.duration) {
-      console.log("calculate zoom IN as normal");
+      // console.log("calculate zoom IN as normal");
 
       for (let i = 0; i <= numberOfTicks; i++) {
         zoomTimelineTicksTest.push(
@@ -178,7 +178,7 @@ function App() {
     !isDraggingScrollBar
   ) {
     // console.log("🍿", zoomTimelineTicks, videoState.duration);
-    console.log("relcalculating to next 🍿");
+    // console.log("relcalculating to next 🍿");
     calculateZoomTimelineTicks("recalculate", 7);
   }
 
@@ -190,7 +190,7 @@ function App() {
     timelineTicks[0] !== 0 &&
     !isDraggingScrollBar
   ) {
-    console.log("recalculating to prev 🥟");
+    // console.log("recalculating to prev 🥟");
     calculateZoomTimelineTicks("recalculate", 2);
   }
 
@@ -221,30 +221,57 @@ function App() {
     useState(null);
 
   const escFunction = () => {
-    console.log("esc func 🤑");
+    // console.log("esc func 🤑");
     setCurrentlySelectedSegment(null);
     dispatch(annotationActions.setCurrentlySelectedSegment(null));
   };
 
-  // const escFunctionWithKey = useCallback((e) => {
+  // const shortcutFunction = useCallback((e) => {
   //   if (e.key === "Escape") {
   //     escFunction();
   //   }
   // });
 
-  const escFunctionWithKey = (e) => {
-    if (e.key === "Escape") {
+  const shortcutFunction = (e) => {
+    // console.log(e.key, e.code);
+
+    if (e.code === "Escape") {
       escFunction();
+    }
+
+    if (e.code === "KeyT") {
+      playPauseHandler();
+    }
+
+    if (e.code === "KeyQ") {
+      handleSeek(videoState.playedSec - 1);
+    }
+    if (e.code === "KeyW") {
+      handleSeek(videoState.playedSec - 2 / inputDataFromRedux?.fps);
+    }
+    if (e.code === "KeyE") {
+      handleSeek(videoState.playedSec + 2 / inputDataFromRedux?.fps);
+    }
+    if (e.code === "KeyR") {
+      handleSeek(videoState.playedSec + 1);
+    }
+
+    if (e.code === "KeyA") {
+      zoomOutHandler();
+    }
+
+    if (e.code === "KeyS") {
+      zoomInHandler();
     }
   };
 
   useEffect(() => {
-    document.addEventListener("keydown", escFunctionWithKey, false);
+    document.addEventListener("keydown", shortcutFunction, false);
 
     return () => {
-      document.removeEventListener("keydown", escFunctionWithKey, false);
+      document.removeEventListener("keydown", shortcutFunction, false);
     };
-  }, [escFunctionWithKey]);
+  }, [shortcutFunction]);
 
   const handleProgress = (state) => {
     const { loaded, loadedSeconds, played, playedSeconds } = state;
@@ -394,20 +421,20 @@ function App() {
                 // playedFrac={videoState.playedFrac}
               />
             </div>
-            {currentlySelectedSegment ? (
-              <SelectedAnnotation
-                deselect={escFunction}
-                currentlySelectedSegment={currentlySelectedSegment}
-                duration={videoState.duration}
-                playedSec={videoState.playedSec}
-                seekTo={handleSeek}
-                play={playHandler}
-                pause={pauseHandler}
-                throwNewError={throwNewError}
-              />
-            ) : (
+            {/* {currentlySelectedSegment ? ( */}
+            <SelectedAnnotation
+              deselect={escFunction}
+              currentlySelectedSegment={currentlySelectedSegment}
+              duration={videoState.duration}
+              playedSec={videoState.playedSec}
+              seekTo={handleSeek}
+              play={playHandler}
+              pause={pauseHandler}
+              throwNewError={throwNewError}
+            />
+            {/* ) : (
               ""
-            )}
+            )} */}
           </div>
           <div className={classes["bottom-container"]}>
             <Annotations

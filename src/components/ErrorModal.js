@@ -10,6 +10,7 @@ const ErrorModal = (props) => {
   };
 
   return (
+    // <div className={classes["overlay"]}>
     <div className={classes["modal-container"]} style={containerStyles}>
       <div className={classes["error-message"]}>
         <h4>ERROR</h4>
@@ -17,6 +18,7 @@ const ErrorModal = (props) => {
       </div>
       <button onClick={modalCloseHandler}>x</button>
     </div>
+    // </div>
   );
 };
 // const ErrorModal = (props) => {
