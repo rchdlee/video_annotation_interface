@@ -27,10 +27,10 @@ const PlayerControls = (props) => {
   return (
     <div className={classes["controls"]}>
       <div className={classes["icon-div"]}>
-        <img src={backFastIcon} alt="" />
+        <img src={backFastIcon} onClick={props.seekBackBig} alt="" />
       </div>
       <div className={classes["icon-div"]}>
-        <img src={backIcon} alt="" />
+        <img src={backIcon} onClick={props.seekBackSmall} alt="" />
       </div>
       {props.playing ? (
         <div className={classes["icon-div"]}>
@@ -42,10 +42,10 @@ const PlayerControls = (props) => {
         </div>
       )}
       <div className={classes["icon-div"]}>
-        <img src={forwardIcon} alt="" />
+        <img src={forwardIcon} onClick={props.seekForwardSmall} alt="" />
       </div>
       <div className={classes["icon-div"]}>
-        <img src={forwardFastIcon} alt="" />
+        <img src={forwardFastIcon} onClick={props.seekForwardBig} alt="" />
       </div>
       <div className={classes["video-info"]}>
         <p style={{ fontSize: "12px", marginBottom: "2px" }}>{fps} FPS</p>

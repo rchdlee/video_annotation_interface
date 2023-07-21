@@ -234,7 +234,10 @@ const Annotations = (props) => {
   };
 
   const shortcutFunction = (e) => {
-    console.log(e.code);
+    if (props.isEditingComment) {
+      return;
+    }
+
     if (e.code === "KeyD") {
       if (selectedChannelIndex === 0) {
         return;
@@ -249,7 +252,7 @@ const Annotations = (props) => {
       setSelectedChannelIndex((prevState) => prevState + 1);
     }
 
-    if (e.code === "Space") {
+    if (e.code === "KeyG") {
       if (!isSelectingFinishTime) {
         const selectedChannelName =
           inputData?.channels[selectedChannelIndex].name;

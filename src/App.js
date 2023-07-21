@@ -27,6 +27,8 @@ function App() {
   const [hasError, setHasError] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
 
+  const [isEditingComment, setIsEditingComment] = useState(false);
+
   const inputDataFromRedux = useSelector((state) => state.annotation.inputData);
 
   const calculatePosition = () => {
@@ -80,11 +82,6 @@ function App() {
   const zoomIncrement = 1;
   const numberOfTicks = 9;
   const initialTickInterval = videoState.duration / numberOfTicks;
-  // const tickInterval = windowTime / numberOfTicks;
-
-  //  DELETE WINDOWNUMBER AND WINDOWTIME
-  // const windowNumber = Math.trunc(videoState.playedSec / windowTime) + 1;
-  // const windowTime = videoState.duration / zoom;
 
   const miniTimelineTicks = [];
   const initialTimelineTicks = [];
@@ -102,13 +99,6 @@ function App() {
   for (let i = 0; i <= numberOfTicks; i++) {
     initialTimelineTicks.push(i * initialTickInterval);
   }
-
-  // console.log(
-  //   timelineTicks[0],
-  //   timelineTicks[numberOfTicks],
-  //   timelineTicks,
-  //   "🍜"
-  // );
 
   const calculateZoomTimelineTicks = (method, offset) => {
     // console.log("ran calculateZoomTimelineTicks 🥨");
@@ -232,28 +222,47 @@ function App() {
   //   }
   // });
 
+  const seekBackBig = () => {
+    handleSeek(videoState.playedSec - 1);
+  };
+
+  const seekBackSmall = () => {
+    handleSeek(videoState.playedSec - 2 / inputDataFromRedux?.fps);
+  };
+
+  const seekForwardSmall = () => {
+    handleSeek(videoState.playedSec + 2 / inputDataFromRedux?.fps);
+  };
+
+  const seekForwardBig = () => {
+    handleSeek(videoState.playedSec + 1);
+  };
+
   const shortcutFunction = (e) => {
     // console.log(e.key, e.code);
+    if (isEditingComment) {
+      return;
+    }
 
     if (e.code === "Escape") {
       escFunction();
     }
 
-    if (e.code === "KeyT") {
+    if (e.code === "Space") {
       playPauseHandler();
     }
 
     if (e.code === "KeyQ") {
-      handleSeek(videoState.playedSec - 1);
+      seekBackBig();
     }
     if (e.code === "KeyW") {
-      handleSeek(videoState.playedSec - 2 / inputDataFromRedux?.fps);
+      seekBackSmall();
     }
     if (e.code === "KeyE") {
-      handleSeek(videoState.playedSec + 2 / inputDataFromRedux?.fps);
+      seekForwardSmall();
     }
     if (e.code === "KeyR") {
-      handleSeek(videoState.playedSec + 1);
+      seekForwardBig();
     }
 
     if (e.code === "KeyA") {
@@ -333,19 +342,6 @@ function App() {
     }));
   };
 
-  // const handleSeekingTrue = () => {
-  //   setVideoState((prevState) => ({
-  //     ...prevState,
-  //     seeking: true,
-  //   }));
-  // };
-  // const handleSeekingFalse = () => {
-  //   setVideoState((prevState) => ({
-  //     ...prevState,
-  //     seeking: false,
-  //   }));
-  // };
-
   // slider 2
   const updatePlayedFrac = (frac) => {
     setVideoState((prevState) => ({
@@ -419,6 +415,10 @@ function App() {
                 duration={videoState.duration}
                 playedSec={videoState.playedSec}
                 // playedFrac={videoState.playedFrac}
+                seekBackBig={seekBackBig}
+                seekBackSmall={seekBackSmall}
+                seekForwardSmall={seekForwardSmall}
+                seekForwardBig={seekForwardBig}
               />
             </div>
             {/* {currentlySelectedSegment ? ( */}
@@ -431,6 +431,8 @@ function App() {
               play={playHandler}
               pause={pauseHandler}
               throwNewError={throwNewError}
+              isEditingComment={isEditingComment}
+              setIsEditingComment={setIsEditingComment}
             />
             {/* ) : (
               ""
@@ -461,6 +463,7 @@ function App() {
               setZoomTimelineTicks={setZoomTimelineTicks}
               setIsDraggingScrollBar={setIsDraggingScrollBar}
               throwNewError={throwNewError}
+              isEditingComment={isEditingComment}
             />
           </div>
           {/* </div> */}

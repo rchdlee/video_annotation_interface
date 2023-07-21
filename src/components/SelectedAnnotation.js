@@ -39,7 +39,7 @@ const SelectedAnnotation = (props) => {
 
   // console.log(radioOptionsLabel, radioOptions, textBoxLabel, "👼");
 
-  const [isEditingComment, setIsEditingComment] = useState(false);
+  // const [isEditingComment, setIsEditingComment] = useState(false);
 
   const radioValueChangeHandler = (e) => {
     dispatch(annotationActions.setRadioValue(e.target.value));
@@ -50,11 +50,11 @@ const SelectedAnnotation = (props) => {
   };
 
   const editCommentHandler = () => {
-    setIsEditingComment(true);
+    props.setIsEditingComment(true);
   };
 
   const finishEditingHandler = () => {
-    setIsEditingComment(false);
+    props.setIsEditingComment(false);
   };
 
   const deselectHandler = () => {
@@ -63,6 +63,9 @@ const SelectedAnnotation = (props) => {
   };
 
   const playSegmentHandler = () => {
+    if (!selectedAnnotation) {
+      return;
+    }
     console.log(selectedAnnotation.timeStartSec);
     const annotationDurationMS =
       (selectedAnnotation.timeEndSec - selectedAnnotation.timeStartSec) * 1000;
@@ -76,7 +79,7 @@ const SelectedAnnotation = (props) => {
     }, [annotationDurationMS]);
 
     const cancelTimeout = () => {
-      console.log("cancel timeout 👜");
+      // console.log("cancel timeout 👜");
       clearTimeout(timeoutID);
       setIsPlayingSegment(false);
     };
@@ -85,11 +88,17 @@ const SelectedAnnotation = (props) => {
   };
 
   const deleteSegmentHandler = () => {
+    if (!selectedAnnotation) {
+      return;
+    }
     dispatch(annotationActions.deleteSelectedAnnotation());
     props.deselect();
   };
 
   const editSegmentStartHandler = () => {
+    if (!selectedAnnotation) {
+      return;
+    }
     console.log("editing start");
     const newStartTime = props.playedSec;
     const isValidated = validateFinishedAnnotation(
@@ -110,6 +119,9 @@ const SelectedAnnotation = (props) => {
   };
 
   const editSegmentEndHandler = () => {
+    if (!selectedAnnotation) {
+      return;
+    }
     console.log("editing end");
     const newEndTime = props.playedSec;
     const isValidated = validateFinishedAnnotation(
@@ -128,6 +140,36 @@ const SelectedAnnotation = (props) => {
     dispatch(annotationActions.editSelectedAnnotationEndTime(newEndTime));
   };
 
+  const shortcutFunction = (e) => {
+    if (props.isEditingComment) {
+      return;
+    }
+
+    if (e.code === "Digit1") {
+      editSegmentStartHandler();
+    }
+
+    if (e.code === "Digit2") {
+      editSegmentEndHandler();
+    }
+
+    if (e.code === "Digit3") {
+      playSegmentHandler();
+    }
+
+    if (e.code === "Digit4") {
+      deleteSegmentHandler();
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("keydown", shortcutFunction, false);
+
+    return () => {
+      document.removeEventListener("keydown", shortcutFunction, false);
+    };
+  }, [shortcutFunction]);
+
   const annotationSubmitHandler = () => {
     const annotationsNeedMoreWork = annotations.map((annotation) => {
       if (annotation.channelHasRadio && annotation.radio === null) {
@@ -144,7 +186,11 @@ const SelectedAnnotation = (props) => {
 
     if (annotationsNeedMoreWork.includes(true)) {
       props.throwNewError(
-        `${numberOfAnnosThatNeedWork} annotations (gray) still need radio button data to be filled`
+        `${numberOfAnnosThatNeedWork} annotation${
+          numberOfAnnosThatNeedWork > 1 ? "s" : ""
+        } (gray) still need${
+          numberOfAnnosThatNeedWork > 1 ? "" : "s"
+        } radio button data to be filled`
       );
       return;
     }
@@ -180,7 +226,7 @@ const SelectedAnnotation = (props) => {
     <form className={classes["comments"]}>
       <div className={classes["comment-label-container"]}>
         <label>{textBoxLabel}</label>
-        {isEditingComment ? (
+        {props.isEditingComment ? (
           <input
             type="submit"
             onClick={finishEditingHandler}
@@ -192,7 +238,7 @@ const SelectedAnnotation = (props) => {
           </button>
         )}
       </div>
-      {isEditingComment ? (
+      {props.isEditingComment ? (
         <input
           type="text"
           value={selectedAnnotation?.comments}
