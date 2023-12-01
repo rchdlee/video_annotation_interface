@@ -52,11 +52,11 @@ const Annotations = (props) => {
   let annotationContainerHeight;
   if (props.screenWidth >= 992 && props.screenWidth < 1200) {
     trackWidth = 650;
-    annotationContainerHeight = 200;
+    annotationContainerHeight = 180;
   }
   if (props.screenWidth >= 1200) {
     trackWidth = 800;
-    annotationContainerHeight = 230;
+    annotationContainerHeight = 200;
   }
 
   const timelineValues = props.timelineTicks.map((timeTick) => {

@@ -67,7 +67,7 @@
 
   .annotation-container {
     width: 800px;
-    height: 200px;
+    height: 180px;
     /* border: 1px solid black; */
   }
 
@@ -214,7 +214,7 @@
   .annotation-container {
     /* width: 65vw; */
     width: 1000px;
-    height: 230px;
+    height: 200px;
     /* height: calc(100vh - 450px); */
   }
 
